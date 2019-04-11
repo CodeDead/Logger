@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("CodeDead")]
 [assembly: AssemblyProduct("CodeDead.Logger")]
-[assembly: AssemblyCopyright("Copyright © CodeDead 2019")]
+[assembly: AssemblyCopyright("Copyright © 2019 CodeDead")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
