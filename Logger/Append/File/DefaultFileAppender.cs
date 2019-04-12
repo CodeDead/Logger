@@ -63,9 +63,9 @@ namespace CodeDead.Logger.Append.File
             if (log == null) throw new ArgumentNullException(nameof(log));
             if (!LogLevels.Contains(log.LogLevel)) return;
 
-            //TODO
             if (Asynchronous)
             {
+                //TODO
                 throw new NotImplementedException();
             }
             else

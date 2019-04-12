@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger
@@ -8,87 +9,64 @@ namespace CodeDead.Logger
     /// </summary>
     public sealed class Logger
     {
-        #region Variables
-        private readonly LogManager _logManager;
-        private bool _enabled;
-
-        private int _maxInMemory;
-        private bool _clearMemory;
-        #endregion
-
         #region Properties
+        /// <summary>
+        /// Property that contains the LogManager object for this Logger instance
+        /// </summary>
+        [XmlElement("LogManager")]
+        public LogManager LogManager { get; set; }
+
         /// <summary>
         /// Property that sets whether exceptions will be thrown or not when calling methods.
         /// Invalid property exceptions will still be thrown
         /// </summary>
+        [XmlElement("ThrowExceptions")]
         public bool ThrowExceptions { get; set; }
 
         /// <summary>
         /// Property that sets whether the logging capabilities are enabled or not
         /// </summary>
-        public bool Enabled
-        {
-            get => _enabled;
-            set
-            {
-                _enabled = value;
-                _logManager.Enabled = value;
-            }
-        }
-
-        /// <summary>
-        /// Property that displays the maximum amount of Log objects that should be kept in memory.
-        /// If the maximum number is reached, the oldest Log object will be cleared from memory
-        /// </summary>
-        public int MaxInMemory
-        {
-            get => _maxInMemory;
-            set
-            {
-                if (value < 1) throw new ArgumentException(nameof(value));
-                _maxInMemory = value;
-                _logManager.MaxInMemory = value;
-            }
-        }
-
-        /// <summary>
-        /// Property that sets whether logs should be removed from memory or not after a certain threshold is reached. See <see cref="MaxInMemory"/>
-        /// </summary>
-        public bool ClearMemory
-        {
-            get => _clearMemory;
-            set
-            {
-                _clearMemory = value;
-                _logManager.ClearMemory = value;
-            }
-        }
+        [XmlElement("Enabled")]
+        public bool Enabled { get; set; }
 
         /// <summary>
         /// Property that sets whether warning logging is enabled or not
         /// </summary>
+        [XmlElement("WarningEnabled")]
         public bool WarningEnabled { get; set; }
         
         /// <summary>
         /// Property that sets whether trace logging is enabled or not
         /// </summary>
+        [XmlElement("TraceEnabled")]
         public bool TraceEnabled { get; set; }
         
         /// <summary>
         /// Property that sets whether info logging is enabled or not
         /// </summary>
+        [XmlElement("InfoEnabled")]
         public bool InfoEnabled { get; set; }
         
         /// <summary>
         /// Property that sets whether debug logging is enabled or not
         /// </summary>
+        [XmlElement("DebugEnabled")]
         public bool DebugEnabled { get; set; }
 
         /// <summary>
         /// Property that sets whether error logging is enabled or not
         /// </summary>
+        [XmlElement("ErrorEnabled")]
         public bool ErrorEnabled { get; set; }
         #endregion
+
+        /// <summary>
+        /// Initialize a new Logger
+        /// </summary>
+        public Logger()
+        {
+            // Empty constructor, required for (de)serialization
+        }
 
         /// <summary>
         /// Initialize a new Logger object
@@ -96,7 +74,7 @@ namespace CodeDead.Logger
         /// <param name="logManager">The LogManager object that can be used to pass logs</param>
         public Logger(LogManager logManager)
         {
-            _logManager = logManager;
+            LogManager = logManager;
 
             Enabled = true;
             ThrowExceptions = false;
@@ -112,7 +90,7 @@ namespace CodeDead.Logger
         {
             try
             {
-                _logManager.AddLog(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
+                LogManager.AddLog(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
             }
             catch (Exception ex)
             {
@@ -227,12 +205,24 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Get the LogManager object
+        /// Write a new error Log object
         /// </summary>
-        /// <returns>The LogManager object</returns>
-        public LogManager GetLogManager()
+        /// <param name="ex">The Exception object that should be added to the Log</param>
+        public void Error(Exception ex)
         {
-            return _logManager;
+            if (!Enabled && !ErrorEnabled) return;
+            AddLog(ex.Message + Environment.NewLine + ex.StackTrace, null, LogLevel.Error);
+        }
+
+        /// <summary>
+        /// Write a new error Log object
+        /// </summary>
+        /// <param name="ex">The Exception object that should be added to the Log</param>
+        /// <param name="context">The context that applies to the Log object</param>
+        public void Error(Exception ex, string context)
+        {
+            if (!Enabled && !ErrorEnabled) return;
+            AddLog(ex.Message + Environment.NewLine + ex.StackTrace, context, LogLevel.Error);
         }
     }
 }

@@ -121,12 +121,64 @@ namespace CodeDead.Logger.Append.Console
             {
                 Task.Run(async () =>
                 {
-                    await System.Console.Out.WriteLineAsync(FormatLog(log));
+                    await WriteLogAsync(log);
                 });
             }
             else
             {
-                System.Console.Out.WriteLine(FormatLog(log));
+                WriteLog(log);
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously write a Log object to the console
+        /// </summary>
+        /// <param name="log">The Log object that should be written to the console</param>
+        /// <returns>The Task object that is associated with this method</returns>
+        private async Task WriteLogAsync(Log log)
+        {
+            await Task.Run(async () =>
+            {
+                switch (log.LogLevel)
+                {
+                    case LogLevel.Trace:
+                        System.Diagnostics.Trace.WriteLine(FormatLog(log));
+                        break;
+                    case LogLevel.Debug:
+                        System.Diagnostics.Debug.WriteLine(FormatLog(log));
+                        break;
+                    case LogLevel.Warning:
+                    case LogLevel.Info:
+                    case LogLevel.Error:
+                        await System.Console.Out.WriteLineAsync(FormatLog(log));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Write a Log object to the console
+        /// </summary>
+        /// <param name="log">The Log object that should be written to the console</param>
+        private void WriteLog(Log log)
+        {
+            switch (log.LogLevel)
+            {
+                case LogLevel.Trace:
+                    System.Diagnostics.Trace.WriteLine(FormatLog(log));
+                    break;
+                case LogLevel.Debug:
+                    System.Diagnostics.Debug.WriteLine(FormatLog(log));
+                    break;
+                case LogLevel.Info:
+                case LogLevel.Warning:
+                case LogLevel.Error:
+                    System.Console.WriteLine(FormatLog(log));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

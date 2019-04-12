@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace CodeDead.Logger.Append.File
 {
@@ -7,6 +8,7 @@ namespace CodeDead.Logger.Append.File
     /// Abstract class containing the file appending logic
     /// Inherit this class to implement your own file appending logic
     /// </summary>
+    [XmlInclude(typeof(DefaultFileAppender))]
     public abstract class FileAppender : LogAppender
     {
         #region Variables
@@ -17,6 +19,7 @@ namespace CodeDead.Logger.Append.File
         /// <summary>
         /// Property that contains the path to which a Log object should be written
         /// </summary>
+        [XmlElement("FilePath")]
         public string FilePath
         {
             get => _filePath;

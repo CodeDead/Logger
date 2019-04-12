@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using CodeDead.Logger.Configuration;
 
 namespace CodeDead.Logger
 {
@@ -24,6 +26,15 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
+        /// Add a Logger object to the Dictionary of Logger objects while generating a random GUID as the key
+        /// </summary>
+        /// <param name="logger">The Logger object that should be added to the Dictionary</param>
+        public static void AddLogger(Logger logger)
+        {
+            Loggers.Add(System.Guid.NewGuid().ToString(), logger);
+        }
+
+        /// <summary>
         /// Generate a new Logger object with a specified key
         /// </summary>
         /// <param name="key">The key that can be used to identify the Logger</param>
@@ -37,22 +48,17 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Get the Logger object using a specified key
+        /// Get all available Logger objects
         /// </summary>
-        /// <param name="key">The key that can be used to retrieve a Logger</param>
-        /// <returns>The Logger object that is associated with the specified key</returns>
-        public static Logger GetLogger(string key)
+        /// <returns>The List of Logger objects</returns>
+        public static List<Logger> GetLoggers()
         {
-            return Loggers[key];
-        }
-
-        /// <summary>
-        /// Remove a Logger from the Dictionary of Logger objects
-        /// </summary>
-        /// <param name="key">The key of the Logger object that should be removed</param>
-        public static void RemoveLogger(string key)
-        {
-            Loggers.Remove(key);
+            List<Logger> loggers = new List<Logger>();
+            foreach (KeyValuePair<string, Logger> entry in Loggers)
+            {
+                loggers.Add(entry.Value);
+            }
+            return loggers;
         }
 
         /// <summary>
@@ -95,11 +101,96 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Clear the key-value pair of loggers
+        /// Load Logger objects from a configuration file
         /// </summary>
-        public static void ClearLoggers()
+        /// <param name="filePath">The path of the configuration file</param>
+        public static void LoadFromConfiguration(string filePath)
         {
-            Loggers.Clear();
+            LoggerRoot root = ConfigurationManager.LoadLoggerRoot(filePath);
+            foreach (Logger logger in root.Loggers)
+            {
+                AddLogger(logger);
+            }
+        }
+
+        /// <summary>
+        /// Load Logger objects from a configuration file asynchronously
+        /// </summary>
+        /// <param name="filePath">The path of the configuration file</param>
+        /// <returns>The Task object that is associated with this asynchronous method</returns>
+        public static async Task LoadFromConfigurationAsync(string filePath)
+        {
+            LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
+            foreach (Logger logger in root.Loggers)
+            {
+                AddLogger(logger);
+            }
+        }
+
+        /// <summary>
+        /// Load Logger objects from a byte array that contains the configuration data
+        /// </summary>
+        /// <param name="configuration">The byte array that contains the configuration data</param>
+        public static void LoadFromConfiguration(byte[] configuration)
+        {
+            LoggerRoot root = ConfigurationManager.LoadLoggerRoot(configuration);
+            foreach (Logger logger in root.Loggers)
+            {
+                AddLogger(logger);
+            }
+        }
+
+        /// <summary>
+        /// Load Logger objects from a byte array that contains the configuration data asynchronously
+        /// </summary>
+        /// <param name="configuration">The byte array that contains the configuration data</param>
+        /// <returns>The Task object that is associated with this asynchronous method</returns>
+        public static async Task LoadFromConfigurationAsync(byte[] configuration)
+        {
+            await Task.Run(async () =>
+            {
+                LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(configuration);
+                foreach (Logger logger in root.Loggers)
+                {
+                    AddLogger(logger);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Save Logger objects to a configuration file
+        /// </summary>
+        /// <param name="filePath">The path where the configuration file should be stored</param>
+        /// <param name="saveFormat">The format in which the configuration data should be stored</param>
+        public static void SaveConfiguration(string filePath, SaveFormats saveFormat)
+        {
+            LoggerRoot root = new LoggerRoot();
+            foreach (KeyValuePair<string, Logger> entry in Loggers)
+            {
+                root.Loggers.Add(entry.Value);
+            }
+
+            ConfigurationManager.SaveLoggerRoot(filePath, root, saveFormat);
+        }
+
+        /// <summary>
+        /// Save Logger objects to a configuration file asynchronously
+        /// </summary>
+        /// <param name="filePath">The path where the configuration file should be stored</param>
+        /// <param name="saveFormat">The format in which the configuration data should be stored</param>
+        /// <returns>The Task object that is associated with this asynchronous method</returns>
+        public static async Task SaveConfigurationAsync(string filePath, SaveFormats saveFormat)
+        {
+            await Task.Run(async () =>
+            {
+                LoggerRoot root = new LoggerRoot();
+                foreach (KeyValuePair<string, Logger> entry in Loggers)
+                {
+                    root.Loggers.Add(entry.Value);
+                }
+
+                await ConfigurationManager.SaveLoggerRootAsync(filePath, root, saveFormat);
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using CodeDead.Logger.Append;
 using CodeDead.Logger.Logging;
 
@@ -11,33 +12,23 @@ namespace CodeDead.Logger
     public sealed class LogManager
     {
         #region Variables
-
-        private bool _enabled;
         private readonly LogRepository _logRepository;
-        private List<LogAppender> _logAppenders;
-
         private int _maxInMemory;
         #endregion
 
         #region Properties
         /// <summary>
-        /// Property that sets whether adding Log objects is enabled or not
+        /// Property that contains the List of LogAppender objects that are associated with this LogManager instance
         /// </summary>
-        internal bool Enabled
-        {
-            get => _enabled;
-            set
-            {
-                _enabled = value;
-                //TODO: log exporters status
-            }
-        }
+        [XmlElement("LogAppender")]
+        public List<LogAppender> LogAppenders;
 
         /// <summary>
         /// Property that displays the maximum amount of Log objects that should be kept in memory.
         /// If the maximum number is reached, the oldest Log object will be cleared from memory
         /// </summary>
-        internal int MaxInMemory
+        [XmlElement("MaxInMemory")]
+        public int MaxInMemory
         {
             get => _maxInMemory;
             set
@@ -50,7 +41,8 @@ namespace CodeDead.Logger
         /// <summary>
         /// Property that sets whether logs should be removed from memory or not after a certain threshold is reached. See <see cref="MaxInMemory"/>
         /// </summary>
-        internal bool ClearMemory { get; set; }
+        [XmlElement("ClearMemory")]
+        public bool ClearMemory { get; set; }
         #endregion
 
         #region Delegates
@@ -100,16 +92,8 @@ namespace CodeDead.Logger
         public LogManager()
         {
             _logRepository = new LogRepository();
-            _logAppenders = new List<LogAppender>();
-        }
-
-        /// <summary>
-        /// Set the List of LogAppender objects that can be used to export Log objects
-        /// </summary>
-        /// <param name="logAppenders">The List of LogAppender objects that can be used to export Log objects</param>
-        public void SetLogAppenders(List<LogAppender> logAppenders)
-        {
-            _logAppenders = logAppenders;
+            LogAppenders = new List<LogAppender>();
+            MaxInMemory = 1;
         }
 
         /// <summary>
@@ -119,7 +103,7 @@ namespace CodeDead.Logger
         public void AddLogAppender(LogAppender logAppender)
         {
             if (logAppender == null) throw new ArgumentNullException(nameof(logAppender));
-            _logAppenders.Add(logAppender);
+            LogAppenders.Add(logAppender);
         }
 
         /// <summary>
@@ -128,16 +112,7 @@ namespace CodeDead.Logger
         /// <param name="logAppender">The LogAppender object that should be removed</param>
         public void RemoveLogAppender(LogAppender logAppender)
         {
-            _logAppenders.Remove(logAppender);
-        }
-
-        /// <summary>
-        /// Get the List of LogAppender objects
-        /// </summary>
-        /// <returns>The List of LogAppender objects</returns>
-        public List<LogAppender> GetLogAppenders()
-        {
-            return _logAppenders;
+            LogAppenders.Remove(logAppender);
         }
 
         /// <summary>
@@ -202,7 +177,7 @@ namespace CodeDead.Logger
 
             _logRepository.AddLog(log);
 
-            foreach (LogAppender exporter in _logAppenders)
+            foreach (LogAppender exporter in LogAppenders)
             {
                 exporter.ExportLog(log);
             }

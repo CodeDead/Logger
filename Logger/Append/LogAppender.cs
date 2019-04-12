@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
+using CodeDead.Logger.Append.Console;
+using CodeDead.Logger.Append.File;
 using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append
 {
-    /// <inheritdoc />
     /// <summary>
     /// Abstract class that can be used to export Log objects
     /// </summary>
-    public abstract class LogAppender : ILogAppender
+    [XmlInclude(typeof(FileAppender))]
+    [XmlInclude(typeof(ConsoleAppender))]
+    public abstract class LogAppender
     {
         #region Variables
         private List<LogLevel> _logLevels;
@@ -19,16 +23,19 @@ namespace CodeDead.Logger.Append
         /// <summary>
         /// Property that displays whether the LogAppender is enabled or not
         /// </summary>
+        [XmlElement("Enabled")]
         public bool Enabled { get; set; }
 
         /// <summary>
         /// Property that sets whether Log objects should be written asynchronously or not
         /// </summary>
+        [XmlElement("Asynchronous")]
         public bool Asynchronous { get; set; }
 
         /// <summary>
         /// Property that sets the format in which Log objects should be displayed in the console
         /// </summary>
+        [XmlElement("Format")]
         public string Format
         {
             get => _format;
@@ -38,6 +45,7 @@ namespace CodeDead.Logger.Append
         /// <summary>
         /// The List of log levels that should be exported
         /// </summary>
+        [XmlElement("LogLevels")]
         public List<LogLevel> LogLevels
         {
             get => _logLevels;

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CodeDead.Logger;
 using CodeDead.Logger.Append.Console;
+using CodeDead.Logger.Configuration;
 using CodeDead.Logger.Logging;
 
 namespace Sample
@@ -17,7 +19,7 @@ namespace Sample
             // Or a default Logger object can be retrieved
             Logger logger = LogFactory.GenerateLogger();
 
-            // The list of log levels that would have to be appended
+            // The list of log levels that would have to be appended to the LogAppender
             List<LogLevel> logLevels = new List<LogLevel>
             {
                 LogLevel.Trace,
@@ -30,7 +32,7 @@ namespace Sample
             // This is the default console appender, but you can implement the LogAppender or ConsoleAppender to write your own logic
             DefaultConsoleAppender consoleWriter = new DefaultConsoleAppender(logLevels, true);
             // You can have as many appenders as your system allows
-            logger.GetLogManager().AddLogAppender(consoleWriter);
+            logger.LogManager.AddLogAppender(consoleWriter);
 
             // Defaults
             logger.Trace("Hello trace!");
@@ -59,17 +61,43 @@ namespace Sample
             consoleWriter.Asynchronous = false;
             logger.Debug("Hello!");
 
+            // Example of Exception logging
+            try
+            {
+                throw new Exception("I'm an error!");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+            }
+
             // Example logger that uses event handling
             Logger logger2 = LogFactory.GenerateLogger();
 
-            logger2.GetLogManager().LogAddedEvent += OnLogAddedEvent;
-            logger2.GetLogManager().LogRemovedEvent += OnLogRemovedEvent;
+            logger2.LogManager.LogAddedEvent += OnLogAddedEvent;
+            logger2.LogManager.LogRemovedEvent += OnLogRemovedEvent;
 
             Log toDelete = new Log("This is going to be deleted", LogLevel.Debug);
-            logger2.GetLogManager().AddLog(toDelete);
-            logger2.GetLogManager().RemoveLog(toDelete);
+            logger2.LogManager.AddLog(toDelete);
+            logger2.LogManager.RemoveLog(toDelete);
 
-            System.Console.ReadLine();
+            // Example of saving configuration to an XML file
+            LogFactory.SaveConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\settings.xml", SaveFormats.Xml);
+            // Example of saving configuration to a JSON file
+            LogFactory.SaveConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\settings.json", SaveFormats.Json);
+
+            // Removing the loggers
+            LogFactory.RemoveLogger(logger);
+            LogFactory.RemoveLogger(logger2);
+
+            // Reloading the previously saved configuration
+            // Events etc. will have to be reapplied though after loading from a configuration file
+            LogFactory.LoadFromConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\settings.json");
+            List<Logger> loggers = LogFactory.GetLoggers();
+            loggers[1].Info("This still won't work");
+            loggers[1].Debug("But this will!");
+
+            Console.ReadLine();
         }
 
         /// <summary>
@@ -79,7 +107,7 @@ namespace Sample
         private static void OnLogRemovedEvent(Log log)
         {
             // If you're working in a UI environment, you might want to use Dispatcher.Invoke
-            System.Console.WriteLine("The log with content " + log.Content + " was removed!");
+            Console.WriteLine("The log with content " + log.Content + " was removed!");
         }
 
         /// <summary>
@@ -89,7 +117,7 @@ namespace Sample
         private static void OnLogAddedEvent(Log log)
         {
             // If you're working in a UI environment, you might want to use Dispatcher.Invoke
-            System.Console.WriteLine(log.Content);
+            Console.WriteLine(log.Content);
         }
     }
 }
