@@ -143,8 +143,8 @@ namespace CodeDead.Logger.Configuration
         /// <param name="root">The LoggerRoot object that should be saved</param>
         private static void SaveLoggerRootJson(string filePath, LoggerRoot root)
         {
-            JsonSerializerSettings jset = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
-            string json = JsonConvert.SerializeObject(root, jset);
+            JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            string json = JsonConvert.SerializeObject(root, settings);
             using (StreamWriter sw = new StreamWriter(filePath))
             {
                 sw.Write(json);
@@ -166,8 +166,8 @@ namespace CodeDead.Logger.Configuration
 
             if (isJson)
             {
-                JsonSerializerSettings jset = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
-                return JsonConvert.DeserializeObject<LoggerRoot>(data, jset);
+                JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+                return JsonConvert.DeserializeObject<LoggerRoot>(data, settings);
             }
 
             XmlSerializer serializer = new XmlSerializer(typeof(LoggerRoot));

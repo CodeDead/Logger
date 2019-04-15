@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append.File
@@ -62,26 +63,17 @@ namespace CodeDead.Logger.Append.File
             if (!Enabled) return;
             if (log == null) throw new ArgumentNullException(nameof(log));
             if (!LogLevels.Contains(log.LogLevel)) return;
-
-            if (Asynchronous)
-            {
-                //TODO
-                throw new NotImplementedException();
-            }
-            else
-            {
-                ExportLogAsync(log);
-            }
+            throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Export a Log object to a file asynchronously
         /// </summary>
         /// <param name="log">The Log object that should be exported</param>
-        /// <returns></returns>
-        private void ExportLogAsync(Log log)
+        /// <returns>The Task object that is associated with this asynchronous method</returns>
+        public override async Task ExportLogAsync(Log log)
         {
-            //TODO
             throw new NotImplementedException();
         }
     }

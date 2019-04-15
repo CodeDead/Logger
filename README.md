@@ -1,5 +1,5 @@
 # CodeDead.Logger
-This repository contains a simple, yet exstensible logging library for .NET Framework applications. Some of the capabilities included in this library are the ability to write logs to any number of different
+This repository contains a simple, yet extensible logging library for .NET Framework applications. Some of the capabilities included in this library are the ability to write logs to any number of different
 files at the same time, writing your own appending logic and even writing logs asynchonously. It is highly recommended to look at the code samples to get a general idea of the workflow.
 
 ## NuGet

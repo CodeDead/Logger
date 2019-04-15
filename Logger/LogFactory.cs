@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CodeDead.Logger.Configuration;
 
@@ -10,7 +11,7 @@ namespace CodeDead.Logger
     public static class LogFactory
     {
         #region Variables
-        private static readonly Dictionary<string, Logger> Loggers = new Dictionary<string, Logger>();
+        private static readonly List<Logger> Loggers = new List<Logger>();
         #endregion
 
         /// <summary>
@@ -19,8 +20,8 @@ namespace CodeDead.Logger
         /// <returns>A newly created Logger object. Can throw an exception if the generated key for the Logger object already exists</returns>
         public static Logger GenerateLogger()
         {
-            Logger logger = new Logger(new LogManager());
-            Loggers.Add(System.Guid.NewGuid().ToString(), logger);
+            Logger logger = new Logger(System.Guid.NewGuid().ToString(), new LogManager());
+            Loggers.Add(logger);
 
             return logger;
         }
@@ -31,18 +32,18 @@ namespace CodeDead.Logger
         /// <param name="logger">The Logger object that should be added to the Dictionary</param>
         public static void AddLogger(Logger logger)
         {
-            Loggers.Add(System.Guid.NewGuid().ToString(), logger);
+            Loggers.Add(logger);
         }
 
         /// <summary>
         /// Generate a new Logger object with a specified key
         /// </summary>
-        /// <param name="key">The key that can be used to identify the Logger</param>
+        /// <param name="name">The key that can be used to identify the Logger</param>
         /// <returns>The newly created Logger object</returns>
-        public static Logger GenerateLogger(string key)
+        public static Logger GenerateLogger(string name)
         {
-            Logger logger = new Logger(new LogManager());
-            Loggers.Add(key, logger);
+            Logger logger = new Logger(name, new LogManager());
+            Loggers.Add(logger);
 
             return logger;
         }
@@ -51,14 +52,19 @@ namespace CodeDead.Logger
         /// Get all available Logger objects
         /// </summary>
         /// <returns>The List of Logger objects</returns>
-        public static List<Logger> GetLoggers()
+        public static IEnumerable<Logger> GetLoggers()
         {
-            List<Logger> loggers = new List<Logger>();
-            foreach (KeyValuePair<string, Logger> entry in Loggers)
-            {
-                loggers.Add(entry.Value);
-            }
-            return loggers;
+            return Loggers;
+        }
+
+        /// <summary>
+        /// Find a List of Logger objects that match the given name
+        /// </summary>
+        /// <param name="name">The name that should be searched for</param>
+        /// <returns>The List of Logger objects that have the given name</returns>
+        public static IEnumerable<Logger> GetLoggersByName(string name)
+        {
+            return Loggers.Where(l => l.Name == name).ToList();
         }
 
         /// <summary>
@@ -67,15 +73,7 @@ namespace CodeDead.Logger
         /// <param name="logger">The Logger object that should be removed</param>
         public static void RemoveLogger(Logger logger)
         {
-            string foundKey = null;
-
-            foreach (KeyValuePair<string, Logger> entry in Loggers)
-            {
-                if (entry.Value == logger) foundKey = entry.Key;
-                break;
-            }
-
-            if (foundKey != null) Loggers.Remove(foundKey);
+            Loggers.Remove(logger);
         }
 
         /// <summary>
@@ -84,20 +82,7 @@ namespace CodeDead.Logger
         /// <param name="loggers">The List of Logger objects that should be removed from the Dictionary of Logger objects</param>
         public static void RemoveLoggers(List<Logger> loggers)
         {
-            List<string> foundKeys = new List<string>();
-
-            foreach (KeyValuePair<string, Logger> entry in Loggers)
-            {
-                foreach (Logger logger in loggers)
-                {
-                    if (entry.Value == logger) foundKeys.Add(entry.Key);
-                }
-            }
-
-            foreach (string key in foundKeys)
-            {
-                Loggers.Remove(key);
-            }
+            Loggers.RemoveAll(loggers.Contains);
         }
 
         /// <summary>
@@ -120,11 +105,14 @@ namespace CodeDead.Logger
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public static async Task LoadFromConfigurationAsync(string filePath)
         {
-            LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
-            foreach (Logger logger in root.Loggers)
+            await Task.Run(async () =>
             {
-                AddLogger(logger);
-            }
+                LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
+                foreach (Logger logger in root.Loggers)
+                {
+                    AddLogger(logger);
+                }
+            });
         }
 
         /// <summary>
@@ -164,12 +152,7 @@ namespace CodeDead.Logger
         /// <param name="saveFormat">The format in which the configuration data should be stored</param>
         public static void SaveConfiguration(string filePath, SaveFormats saveFormat)
         {
-            LoggerRoot root = new LoggerRoot();
-            foreach (KeyValuePair<string, Logger> entry in Loggers)
-            {
-                root.Loggers.Add(entry.Value);
-            }
-
+            LoggerRoot root = new LoggerRoot {Loggers = Loggers};
             ConfigurationManager.SaveLoggerRoot(filePath, root, saveFormat);
         }
 
@@ -183,12 +166,7 @@ namespace CodeDead.Logger
         {
             await Task.Run(async () =>
             {
-                LoggerRoot root = new LoggerRoot();
-                foreach (KeyValuePair<string, Logger> entry in Loggers)
-                {
-                    root.Loggers.Add(entry.Value);
-                }
-
+                LoggerRoot root = new LoggerRoot { Loggers = Loggers };
                 await ConfigurationManager.SaveLoggerRootAsync(filePath, root, saveFormat);
             });
         }

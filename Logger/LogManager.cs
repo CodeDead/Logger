@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CodeDead.Logger.Append;
 using CodeDead.Logger.Logging;
@@ -170,9 +171,12 @@ namespace CodeDead.Logger
         /// <param name="log">The Log that should be added to the log repository</param>
         public void AddLog(Log log)
         {
-            if (ClearMemory && _logRepository.GetLogs().Count + 1 > MaxInMemory)
+            if (ClearMemory)
             {
-                _logRepository.RemoveLog(_logRepository.GetLogs()[0]);
+                while (_logRepository.GetLogs().Count + 1 > MaxInMemory)
+                {
+                    _logRepository.RemoveLog(_logRepository.GetLogs()[0]);
+                }
             }
 
             _logRepository.AddLog(log);
@@ -183,6 +187,34 @@ namespace CodeDead.Logger
             }
 
             LogAddedEvent?.Invoke(log);
+        }
+
+        /// <summary>
+        /// Add a Log object to the LogRepository instance asynchronously
+        /// </summary>
+        /// <param name="log">The Log object that should be added to the LogRepository instance</param>
+        /// <returns>The Task object that is associated with this asynchronous method</returns>
+        public async Task AddLogAsync(Log log)
+        {
+            await Task.Run(async () =>
+            {
+                if (ClearMemory)
+                {
+                    while (_logRepository.GetLogs().Count + 1 > MaxInMemory)
+                    {
+                        _logRepository.RemoveLog(_logRepository.GetLogs()[0]);
+                    }
+                }
+
+                _logRepository.AddLog(log);
+
+                foreach (LogAppender exporter in LogAppenders)
+                {
+                    await exporter.ExportLogAsync(log);
+                }
+
+                LogAddedEvent?.Invoke(log);
+            });
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CodeDead.Logger;
 using CodeDead.Logger.Append.Console;
 using CodeDead.Logger.Configuration;
@@ -12,12 +13,13 @@ namespace Sample
     /// </summary>
     internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
             // Logger objects can be generated using the LogFactory using either a key:
             // Logger logger = LogFactory.GenerateLogger("MAIN");
             // Or a default Logger object can be retrieved
             Logger logger = LogFactory.GenerateLogger();
+            string defaultName = logger.Name;
 
             // The list of log levels that would have to be appended to the LogAppender
             List<LogLevel> logLevels = new List<LogLevel>
@@ -51,15 +53,11 @@ namespace Sample
             logger.Info("This will no longer save this type of log or output it to the console");
             logger.Debug("This, on the other hand, is still active");
 
-            // Writing logs will now happen asynchronously
-            consoleWriter.Asynchronous = true;
+            // Write some logs asynchronously
             for (int i = 0; i < 50; i++)
             {
-                logger.Debug("This is asynchronous write #" + i);
+                logger.DebugAsync("This is asynchronous write #" + i);
             }
-            // Disable async logging
-            consoleWriter.Asynchronous = false;
-            logger.Debug("Hello!");
 
             // Example of Exception logging
             try
@@ -93,9 +91,11 @@ namespace Sample
             // Reloading the previously saved configuration
             // Events etc. will have to be reapplied though after loading from a configuration file
             LogFactory.LoadFromConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\settings.json");
-            List<Logger> loggers = LogFactory.GetLoggers();
-            loggers[1].Info("This still won't work");
-            loggers[1].Debug("But this will!");
+            List<Logger> loadedLogger = LogFactory.GetLoggersByName(defaultName).ToList();
+
+            loadedLogger[0].Info("This still won't work");
+            loadedLogger[0].InfoEnabled = true;
+            loadedLogger[0].Info("But this will!");
 
             Console.ReadLine();
         }

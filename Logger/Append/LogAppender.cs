@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CodeDead.Logger.Append.Console;
 using CodeDead.Logger.Append.File;
@@ -25,12 +26,6 @@ namespace CodeDead.Logger.Append
         /// </summary>
         [XmlElement("Enabled")]
         public bool Enabled { get; set; }
-
-        /// <summary>
-        /// Property that sets whether Log objects should be written asynchronously or not
-        /// </summary>
-        [XmlElement("Asynchronous")]
-        public bool Asynchronous { get; set; }
 
         /// <summary>
         /// Property that sets the format in which Log objects should be displayed in the console
@@ -114,5 +109,12 @@ namespace CodeDead.Logger.Append
         /// </summary>
         /// <param name="log">The Log object that should be exported</param>
         public abstract void ExportLog(Log log);
+
+        /// <summary>
+        /// Export a Log object asynchronously
+        /// </summary>
+        /// <param name="log">The Log object that should be exported</param>
+        /// <returns>The Task that is associated with this asynchronous method</returns>
+        public abstract Task ExportLogAsync(Log log);
     }
 }

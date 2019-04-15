@@ -106,6 +106,18 @@ namespace CodeDead.Logger.Append.Console
             return output;
         }
 
+        /// <summary>
+        /// Check whether a Log object can be exported or not
+        /// </summary>
+        /// <param name="log">The Log object that should be validated</param>
+        /// <returns>True if the Log object can be exported, otherwise false</returns>
+        private bool ValidExport(Log log)
+        {
+            if (!Enabled) return false;
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            return LogLevels.Contains(log.LogLevel);
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// Export a Log object to the console
@@ -113,30 +125,36 @@ namespace CodeDead.Logger.Append.Console
         /// <param name="log">The Log object that should be exported to the console</param>
         public override void ExportLog(Log log)
         {
-            if (!Enabled) return;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            if (!LogLevels.Contains(log.LogLevel)) return;
+            if (!ValidExport(log)) return;
 
-            if (Asynchronous)
+            switch (log.LogLevel)
             {
-                Task.Run(async () =>
-                {
-                    await WriteLogAsync(log);
-                });
-            }
-            else
-            {
-                WriteLog(log);
+                case LogLevel.Trace:
+                    System.Diagnostics.Trace.WriteLine(FormatLog(log));
+                    break;
+                case LogLevel.Debug:
+                    System.Diagnostics.Debug.WriteLine(FormatLog(log));
+                    break;
+                case LogLevel.Info:
+                case LogLevel.Warning:
+                case LogLevel.Error:
+                    System.Console.WriteLine(FormatLog(log));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Asynchronously write a Log object to the console
+        /// Export a Log object to the console asynchronously
         /// </summary>
-        /// <param name="log">The Log object that should be written to the console</param>
-        /// <returns>The Task object that is associated with this method</returns>
-        private async Task WriteLogAsync(Log log)
+        /// <param name="log">The Log object that should be exported to the console</param>
+        /// <returns>The Task that is associated with this asynchronous method</returns>
+        public override async Task ExportLogAsync(Log log)
         {
+            if (!ValidExport(log)) return;
+
             await Task.Run(async () =>
             {
                 switch (log.LogLevel)
@@ -156,30 +174,6 @@ namespace CodeDead.Logger.Append.Console
                         throw new ArgumentOutOfRangeException();
                 }
             });
-        }
-
-        /// <summary>
-        /// Write a Log object to the console
-        /// </summary>
-        /// <param name="log">The Log object that should be written to the console</param>
-        private void WriteLog(Log log)
-        {
-            switch (log.LogLevel)
-            {
-                case LogLevel.Trace:
-                    System.Diagnostics.Trace.WriteLine(FormatLog(log));
-                    break;
-                case LogLevel.Debug:
-                    System.Diagnostics.Debug.WriteLine(FormatLog(log));
-                    break;
-                case LogLevel.Info:
-                case LogLevel.Warning:
-                case LogLevel.Error:
-                    System.Console.WriteLine(FormatLog(log));
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
         }
     }
 }
