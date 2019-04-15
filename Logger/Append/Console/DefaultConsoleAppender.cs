@@ -23,6 +23,7 @@ namespace CodeDead.Logger.Append.Console
         {
             Format = DefaultFormat;
             LogLevels = new List<LogLevel>();
+            Enabled = true;
         }
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace CodeDead.Logger.Append.Console
         {
             Format = DefaultFormat;
             LogLevels = logLevels;
+            Enabled = true;
         }
 
         /// <summary>
@@ -64,7 +66,9 @@ namespace CodeDead.Logger.Append.Console
         /// <param name="format">The format in which the Log object should be outputted to the console</param>
         public DefaultConsoleAppender(string format)
         {
+            LogLevels = new List<LogLevel>();
             Format = format;
+            Enabled = true;
         }
 
         /// <summary>
@@ -76,6 +80,7 @@ namespace CodeDead.Logger.Append.Console
         {
             Format = format;
             LogLevels = logLevels;
+            Enabled = true;
         }
 
         /// <summary>
@@ -174,6 +179,15 @@ namespace CodeDead.Logger.Append.Console
                         throw new ArgumentOutOfRangeException();
                 }
             });
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Dispose of the DefaultConsoleAppender instance
+        /// </summary>
+        public override void Dispose()
+        {
+            // Nothing needs to be disposed
         }
     }
 }

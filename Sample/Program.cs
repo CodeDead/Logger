@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CodeDead.Logger;
 using CodeDead.Logger.Append.Console;
+using CodeDead.Logger.Append.File;
 using CodeDead.Logger.Configuration;
 using CodeDead.Logger.Logging;
 
@@ -13,7 +15,7 @@ namespace Sample
     /// </summary>
     internal static class Program
     {
-        private static void Main()
+        private static async Task Main()
         {
             // Logger objects can be generated using the LogFactory using either a key:
             // Logger logger = LogFactory.GenerateLogger("MAIN");
@@ -31,10 +33,13 @@ namespace Sample
                 LogLevel.Error
             };
 
-            // This is the default console appender, but you can implement the LogAppender or ConsoleAppender to write your own logic
+            // This is the default console appender but you can implement the LogAppender or ConsoleAppender to write your own logic
             DefaultConsoleAppender consoleWriter = new DefaultConsoleAppender(logLevels, true);
+            // This is the default file appender but you can implement the LogAppender or FileAppender to write your own logic
+            DefaultFileAppender fileAppender = new DefaultFileAppender(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\exampleLog.log", logLevels, true);
             // You can have as many appenders as your system allows
             logger.LogManager.AddLogAppender(consoleWriter);
+            logger.LogManager.AddLogAppender(fileAppender);
 
             // Defaults
             logger.Trace("Hello trace!");
@@ -56,7 +61,7 @@ namespace Sample
             // Write some logs asynchronously
             for (int i = 0; i < 50; i++)
             {
-                logger.DebugAsync("This is asynchronous write #" + i);
+                await logger.DebugAsync("This is asynchronous write #" + i);
             }
 
             // Example of Exception logging

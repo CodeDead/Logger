@@ -8,12 +8,13 @@ using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append
 {
+    /// <inheritdoc />
     /// <summary>
     /// Abstract class that can be used to export Log objects
     /// </summary>
     [XmlInclude(typeof(FileAppender))]
     [XmlInclude(typeof(ConsoleAppender))]
-    public abstract class LogAppender
+    public abstract class LogAppender : IDisposable
     {
         #region Variables
         private List<LogLevel> _logLevels;
@@ -116,5 +117,11 @@ namespace CodeDead.Logger.Append
         /// <param name="log">The Log object that should be exported</param>
         /// <returns>The Task that is associated with this asynchronous method</returns>
         public abstract Task ExportLogAsync(Log log);
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Dispose of all resources
+        /// </summary>
+        public abstract void Dispose();
     }
 }

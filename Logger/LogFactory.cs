@@ -27,9 +27,9 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Add a Logger object to the Dictionary of Logger objects while generating a random GUID as the key
+        /// Add a Logger object to the List of Logger objects while generating a random GUID as the key
         /// </summary>
-        /// <param name="logger">The Logger object that should be added to the Dictionary</param>
+        /// <param name="logger">The Logger object that should be added to the List</param>
         public static void AddLogger(Logger logger)
         {
             Loggers.Add(logger);
@@ -68,18 +68,19 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Remove a Logger from the Dictionary of logger objects
+        /// Remove a Logger from the List of logger objects
         /// </summary>
         /// <param name="logger">The Logger object that should be removed</param>
         public static void RemoveLogger(Logger logger)
         {
+            logger.LogManager.LogAppenders.ForEach(a => a.Dispose());
             Loggers.Remove(logger);
         }
 
         /// <summary>
-        /// Remove a List of Logger objects from the Dictionary of Logger objects
+        /// Remove a List of Logger objects from the List of Logger objects
         /// </summary>
-        /// <param name="loggers">The List of Logger objects that should be removed from the Dictionary of Logger objects</param>
+        /// <param name="loggers">The List of Logger objects that should be removed from the List of Logger objects</param>
         public static void RemoveLoggers(List<Logger> loggers)
         {
             Loggers.RemoveAll(loggers.Contains);
