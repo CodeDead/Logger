@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace CodeDead.Logger.Logging
 {
@@ -15,11 +16,13 @@ namespace CodeDead.Logger.Logging
         /// <summary>
         /// The DateTime at which the Log object was created
         /// </summary>
+        [XmlElement("LogDate")]
         public DateTime LogDate { get; }
 
         /// <summary>
         /// The content of this Log object
         /// </summary>
+        [XmlElement("Content")]
         public string Content
         {
             get => _logContent;
@@ -29,13 +32,23 @@ namespace CodeDead.Logger.Logging
         /// <summary>
         /// The LogLevel of this Log object
         /// </summary>
+        [XmlElement("LogLevel")]
         public LogLevel LogLevel { get; set; }
 
         /// <summary>
         /// The context of this Log object
         /// </summary>
+        [XmlElement("Context")]
         public string Context { get; set; }
         #endregion
+
+        /// <summary>
+        /// Initialize a new Log object
+        /// </summary>
+        public Log()
+        {
+            LogDate = DateTime.Now;
+        }
 
         /// <summary>
         /// Initialize a new Log object

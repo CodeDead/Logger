@@ -9,6 +9,7 @@ namespace CodeDead.Logger.Append.File
     /// Inherit this class to implement your own file appending logic
     /// </summary>
     [XmlInclude(typeof(DefaultFileAppender))]
+    [XmlInclude(typeof(JsonFileAppender))]
     public abstract class FileAppender : LogAppender
     {
         #region Variables

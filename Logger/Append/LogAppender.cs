@@ -18,7 +18,6 @@ namespace CodeDead.Logger.Append
     {
         #region Variables
         private List<LogLevel> _logLevels;
-        private string _format;
         #endregion
 
         #region Properties
@@ -32,11 +31,7 @@ namespace CodeDead.Logger.Append
         /// Property that sets the format in which Log objects should be displayed in the console
         /// </summary>
         [XmlElement("Format")]
-        public string Format
-        {
-            get => _format;
-            set => _format = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        public string Format { get; set; }
 
         /// <summary>
         /// The List of log levels that should be exported

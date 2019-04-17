@@ -49,7 +49,9 @@
     <Compile Include="Append\Console\DefaultConsoleAppender.cs" />
     <Compile Include="Append\File\DefaultFileAppender.cs" />
     <Compile Include="Append\File\FileAppender.cs" />
+    <Compile Include="Append\File\JsonFileAppender.cs" />
     <Compile Include="Append\LogAppender.cs" />
+    <Compile Include="Configuration\LogRoot.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="LogFactory.cs" />
     <Compile Include="Logger.cs" />
