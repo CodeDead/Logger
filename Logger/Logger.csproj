@@ -50,6 +50,7 @@
     <Compile Include="Append\File\DefaultFileAppender.cs" />
     <Compile Include="Append\File\FileAppender.cs" />
     <Compile Include="Append\File\JsonFileAppender.cs" />
+    <Compile Include="Append\File\XmlFileAppender.cs" />
     <Compile Include="Append\LogAppender.cs" />
     <Compile Include="Configuration\LogRoot.cs" />
     <Compile Include="Logging\Log.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Configuration\LoggerRoot.cs" />
     <Compile Include="Configuration\SaveFormats.cs" />
     <Compile Include="Configuration\ConfigurationManager.cs" />
+    <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

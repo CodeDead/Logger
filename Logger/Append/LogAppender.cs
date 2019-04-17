@@ -28,12 +28,6 @@ namespace CodeDead.Logger.Append
         public bool Enabled { get; set; }
 
         /// <summary>
-        /// Property that sets the format in which Log objects should be displayed in the console
-        /// </summary>
-        [XmlElement("Format")]
-        public string Format { get; set; }
-
-        /// <summary>
         /// The List of log levels that should be exported
         /// </summary>
         [XmlElement("LogLevels")]

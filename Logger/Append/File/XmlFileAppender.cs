@@ -1,86 +1,87 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 using CodeDead.Logger.Configuration;
 using CodeDead.Logger.Logging;
-using Newtonsoft.Json;
 
 namespace CodeDead.Logger.Append.File
 {
     /// <inheritdoc />
     /// <summary>
-    /// Sealed class that contains logic to store Log objects as JSON
+    /// Sealed class that contains the logic to store Log objects as XML
     /// </summary>
-    public sealed class JsonFileAppender : FileAppender
+    public sealed class XmlFileAppender : FileAppender
     {
         #region Variables
-        private readonly JsonSerializerSettings _settings;
+        private readonly XmlSerializer _serializer;
         #endregion
 
         /// <summary>
-        /// Initialize a new JsonFileAppender
+        /// Initialize a new XmlFileAppender
         /// </summary>
-        public JsonFileAppender()
+        public XmlFileAppender()
         {
             LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
-            _settings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects};
+            _serializer = new XmlSerializer(typeof(LogRoot));
         }
 
         /// <summary>
-        /// Initialize a new JsonFileAppender
+        /// Initialize a new XmlFileAppender
         /// </summary>
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
-        public JsonFileAppender(string path)
+        public XmlFileAppender(string path)
         {
             FilePath = path;
             LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = true;
         }
 
         /// <summary>
-        /// Initialize a new JsonFileAppender
+        /// Initialize a new XmlFileAppender
         /// </summary>
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
-        public JsonFileAppender(string path, bool enabled)
+        public XmlFileAppender(string path, bool enabled)
         {
             FilePath = path;
             LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = enabled;
         }
 
         /// <summary>
-        /// Initialize a new JsonFileAppender
+        /// Initialize a new XmlFileAppender
         /// </summary>
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         /// <param name="logLevels">The List of log levels that should be exported</param>
-        public JsonFileAppender(string path, List<LogLevel> logLevels)
+        public XmlFileAppender(string path, List<LogLevel> logLevels)
         {
             FilePath = path;
             LogLevels = logLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = true;
         }
 
         /// <summary>
-        /// Initialize a new JsonFileAppender
+        /// Initialize a new XmlFileAppender
         /// </summary>
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         /// <param name="logLevels">The List of log levels that should be exported</param>
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
-        public JsonFileAppender(string path, List<LogLevel> logLevels, bool enabled)
+        public XmlFileAppender(string path, List<LogLevel> logLevels, bool enabled)
         {
             FilePath = path;
             LogLevels = logLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = enabled;
         }
 
         /// <inheritdoc />
         /// <summary>
-        /// Export a Log object as a JSON string
+        /// Export a Log object as an XML string
         /// </summary>
         /// <param name="log">The Log object that should be exported</param>
         public override void ExportLog(Log log)
@@ -102,7 +103,18 @@ namespace CodeDead.Logger.Append.File
                 // Ignored
             }
 
-            LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : JsonConvert.DeserializeObject<LogRoot>(readContents, _settings);
+
+            LogRoot root = null;
+            if (!string.IsNullOrEmpty(readContents))
+            {
+                // Convert the XML into a LogRoot object
+                using (TextReader reader = new StringReader(readContents))
+                {
+                    root = (LogRoot)_serializer.Deserialize(reader);
+                }
+            }
+
+            if (root == null) root = new LogRoot();
 
             // Add a Log to the LogRoot object
             root.Logs.Add(log);
@@ -110,12 +122,20 @@ namespace CodeDead.Logger.Append.File
 
             using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
             {
-                // Convert it back into a JSON
-                string json = JsonConvert.SerializeObject(root, _settings);
+                string xml;
+                using (StringWriter sww = new StringWriter())
+                {
+                    using (XmlWriter writer = XmlWriter.Create(sww))
+                    {
+                        // Convert the object back to XML
+                        _serializer.Serialize(writer, root);
+                        xml = sww.ToString();
+                    }
+                }
 
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
-                    sw.Write(json);
+                    sw.Write(xml);
                     sw.Flush();
                 }
             }
@@ -123,7 +143,7 @@ namespace CodeDead.Logger.Append.File
 
         /// <inheritdoc />
         /// <summary>
-        /// Export a Log object as a JSON string asynchronously
+        /// Export a Log object as an XML string asynchronously
         /// </summary>
         /// <param name="log">The Log object that should be exported</param>
         /// <returns>The Task object that is associated with this method</returns>
@@ -148,7 +168,18 @@ namespace CodeDead.Logger.Append.File
                     // Ignored
                 }
 
-                LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : JsonConvert.DeserializeObject<LogRoot>(readContents, _settings);
+
+                LogRoot root = null;
+                if (!string.IsNullOrEmpty(readContents))
+                {
+                    // Convert the XML into a LogRoot object
+                    using (TextReader reader = new StringReader(readContents))
+                    {
+                        root = (LogRoot)_serializer.Deserialize(reader);
+                    }
+                }
+
+                if (root == null) root = new LogRoot();
 
                 // Add a Log to the LogRoot object
                 root.Logs.Add(log);
@@ -156,12 +187,21 @@ namespace CodeDead.Logger.Append.File
 
                 using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    // Convert it back into a JSON
-                    string json = JsonConvert.SerializeObject(root, _settings);
+
+                    string xml;
+                    using (StringWriter sww = new StringWriter())
+                    {
+                        using (XmlWriter writer = XmlWriter.Create(sww))
+                        {
+                            // Convert the object back to XML
+                            _serializer.Serialize(writer, root);
+                            xml = sww.ToString();
+                        }
+                    }
 
                     using (StreamWriter sw = new StreamWriter(fs))
                     {
-                        await sw.WriteAsync(json);
+                        await sw.WriteAsync(xml);
                         await sw.FlushAsync();
                     }
                 }
@@ -170,7 +210,7 @@ namespace CodeDead.Logger.Append.File
 
         /// <inheritdoc />
         /// <summary>
-        /// Dispose of any resources that are in use
+        /// Dispose of all resources
         /// </summary>
         public override void Dispose()
         {

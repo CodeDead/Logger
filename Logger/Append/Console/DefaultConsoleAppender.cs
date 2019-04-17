@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append.Console
@@ -16,13 +17,21 @@ namespace CodeDead.Logger.Append.Console
         private const string DefaultFormat = "[%d]\t[%l](%C)\t-\t%c";
         #endregion
 
+        #region Properties
+        /// <summary>
+        /// Property that sets the format in which Log objects should be displayed in the console
+        /// </summary>
+        [XmlElement("Format")]
+        public string Format { get; set; }
+        #endregion
+
         /// <summary>
         /// Initialize a new DefaultConsoleAppender object
         /// </summary>
         public DefaultConsoleAppender()
         {
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel>();
+            LogLevels = new List<LogLevel> {LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error};
             Enabled = true;
         }
 
@@ -32,7 +41,7 @@ namespace CodeDead.Logger.Append.Console
         /// <param name="enabled">True if exporting Log objects to the console should be enabled, otherwise false</param>
         public DefaultConsoleAppender(bool enabled)
         {
-            LogLevels = new List<LogLevel>();
+            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
             Format = DefaultFormat;
             Enabled = enabled;
         }

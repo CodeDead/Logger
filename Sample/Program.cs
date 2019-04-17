@@ -23,20 +23,10 @@ namespace Sample
             Logger logger = LogFactory.GenerateLogger();
             string defaultName = logger.Name;
 
-            // The list of log levels that would have to be appended to the LogAppender
-            List<LogLevel> logLevels = new List<LogLevel>
-            {
-                LogLevel.Trace,
-                LogLevel.Debug,
-                LogLevel.Info,
-                LogLevel.Warning,
-                LogLevel.Error
-            };
-
             // This is the default console appender but you can implement the LogAppender or ConsoleAppender to write your own logic
-            DefaultConsoleAppender consoleWriter = new DefaultConsoleAppender(logLevels, true);
+            DefaultConsoleAppender consoleWriter = new DefaultConsoleAppender();
             // This is the default file appender but you can implement the LogAppender or FileAppender to write your own logic
-            DefaultFileAppender fileAppender = new DefaultFileAppender(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\exampleLog.log", logLevels, true);
+            DefaultFileAppender fileAppender = new DefaultFileAppender(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\exampleLog.log");
             // You can have as many appenders as your system allows
             logger.LogManager.AddLogAppender(consoleWriter);
             logger.LogManager.AddLogAppender(fileAppender);
