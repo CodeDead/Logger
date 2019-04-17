@@ -14,7 +14,7 @@ namespace CodeDead.Logger.Configuration
         /// <summary>
         /// Property that contains a List of Log objects
         /// </summary>
-        [XmlElement("Log")]
+        [XmlArray("Logs"), XmlArrayItem(typeof(Log), ElementName = "Log")]
         public List<Log> Logs;
         #endregion
 

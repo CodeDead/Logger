@@ -13,7 +13,7 @@ namespace CodeDead.Logger.Configuration
         /// <summary>
         /// Property that contains the List of Logger objects that can be saved to the filesystem or were loaded from the filesystem
         /// </summary>
-        [XmlElement("Logger")]
+        [XmlArray("LoggerList"), XmlArrayItem(typeof(Logger), ElementName = "Logger")]
         public List<Logger> Loggers;
         #endregion
 

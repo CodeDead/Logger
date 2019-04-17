@@ -30,7 +30,7 @@ namespace CodeDead.Logger.Append
         /// <summary>
         /// The List of log levels that should be exported
         /// </summary>
-        [XmlElement("LogLevels")]
+        [XmlArray("LogLevels"), XmlArrayItem(typeof(LogLevel), ElementName = "LogLevel")]
         public List<LogLevel> LogLevels
         {
             get => _logLevels;

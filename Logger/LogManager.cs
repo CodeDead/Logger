@@ -21,7 +21,7 @@ namespace CodeDead.Logger
         /// <summary>
         /// Property that contains the List of LogAppender objects that are associated with this LogManager instance
         /// </summary>
-        [XmlElement("LogAppender")]
+        [XmlArray("LogAppenders"), XmlArrayItem(typeof(LogAppender), ElementName = "LogAppender")]
         public List<LogAppender> LogAppenders;
 
         /// <summary>
