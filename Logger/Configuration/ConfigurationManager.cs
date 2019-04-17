@@ -159,8 +159,8 @@ namespace CodeDead.Logger.Configuration
         private static LoggerRoot LoadConfiguration(string data)
         {
             if (string.IsNullOrEmpty(data)) throw new ArgumentException(nameof(data));
-            bool isJson = Utils.Utils.IsJson(data);
-            bool isXml = Utils.Utils.IsXml(data);
+            bool isJson = IsJson(data);
+            bool isXml = IsXml(data);
 
             if (!isJson && !isXml) throw new ArgumentException(nameof(data));
 
@@ -175,6 +175,28 @@ namespace CodeDead.Logger.Configuration
             {
                 return (LoggerRoot)serializer.Deserialize(reader);
             }
+        }
+
+        /// <summary>
+        /// Check if an input might be a JSON
+        /// </summary>
+        /// <param name="input">The input that should be validated</param>
+        /// <returns>True if the input might be JSON, otherwise false</returns>
+        private static bool IsJson(string input)
+        {
+            input = input.Trim();
+            return input.StartsWith("{") && input.EndsWith("}")
+                   || input.StartsWith("[") && input.EndsWith("]");
+        }
+
+        /// <summary>
+        /// Check if an input might be XML
+        /// </summary>
+        /// <param name="data">The input that should be validated</param>
+        /// <returns>True if the input might be XML, otherwise false</returns>
+        private static bool IsXml(string data)
+        {
+            return !string.IsNullOrEmpty(data) && data.TrimStart().StartsWith("<");
         }
 
         /// <summary>

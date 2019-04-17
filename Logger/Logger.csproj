@@ -63,7 +63,6 @@
     <Compile Include="Configuration\LoggerRoot.cs" />
     <Compile Include="Configuration\SaveFormats.cs" />
     <Compile Include="Configuration\ConfigurationManager.cs" />
-    <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
