@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CodeDead.Logger.Append.Console;
+using CodeDead.Logger.Append.Event;
 using CodeDead.Logger.Append.File;
 using CodeDead.Logger.Logging;
 
@@ -14,6 +15,7 @@ namespace CodeDead.Logger.Append
     /// </summary>
     [XmlInclude(typeof(FileAppender))]
     [XmlInclude(typeof(ConsoleAppender))]
+    [XmlInclude(typeof(EventAppender))]
     public abstract class LogAppender : IDisposable
     {
         #region Variables

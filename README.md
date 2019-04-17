@@ -11,7 +11,6 @@ This library is available as a NuGet package:
 * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 
 ## Example usage
-
 ```
 // Logger objects can be generated using the LogFactory using either a key:
 // Logger logger = LogFactory.GenerateLogger("MAIN");
@@ -35,10 +34,24 @@ logger.Warn("Hello warn!");
 logger.Error("Hello error!");
 ```
 
+## Appenders
+Appenders are used for 'appending' logs to a specific output. There are some implementations of those available to you already. They are:
+
+| Class | Description |
+| --- | --- |
+| `DefaultConsoleAppender` | Default implementation of the `ConsoleAppender` that can be used for writing logs to the console using a `Format` that can be customized |
+| `DefaultFileAppender` | Default implementation of the `FileAppender` that can be used for writing logs to a file using a `Format` that can be customized |
+| `JsonFileAppender` | A spin of the `FileAppender` that can write logs as a JSON file |
+| `XmlFileAppender` | A spin of the `FileAppender` that can write logs as an XML file |
+| `WindowsEventAppender` | A spin of the `EventAppender` that can write logs to the Windows Event Log |
+
 # TODO
-- [X] Allow Settings to be read/exported to/from a file (JSON/XML)
+- [X] Allow loggers to be read/exported to/from a file (JSON/XML)
 - [X] Write the code for the DefaultFileAppender
+- [X] Write the code for the XmlFileAppender
+- [X] Write the code for the JsonFileAppender
 - [ ] Write the code for the RollingFileAppender
+- [X] Write the code for the WindowsEventAppender
 - [ ] Write documentation
 - [X] Write contribution guidelines
 - [ ] Publish on NuGet

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
@@ -79,6 +80,18 @@ namespace CodeDead.Logger.Append.File
             Enabled = enabled;
         }
 
+        /// <summary>
+        /// Validate whether a Log can be exported or not
+        /// </summary>
+        /// <param name="log">The Log object that needs to be validated</param>
+        /// <returns>True if a Log can be exported, otherwise false</returns>
+        private bool ValidLog(Log log)
+        {
+            if (!Enabled) return false;
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            return LogLevels.Contains(log.LogLevel);
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// Export a Log object as an XML string
@@ -86,6 +99,7 @@ namespace CodeDead.Logger.Append.File
         /// <param name="log">The Log object that should be exported</param>
         public override void ExportLog(Log log)
         {
+            if (!ValidLog(log)) return;
             string readContents = null;
             try
             {
@@ -151,6 +165,7 @@ namespace CodeDead.Logger.Append.File
         {
             await Task.Run(async () =>
             {
+                if (!ValidLog(log)) return;
                 string readContents = null;
                 try
                 {

@@ -47,11 +47,13 @@
   <ItemGroup>
     <Compile Include="Append\Console\ConsoleAppender.cs" />
     <Compile Include="Append\Console\DefaultConsoleAppender.cs" />
+    <Compile Include="Append\Event\WindowsEventAppender.cs" />
     <Compile Include="Append\File\DefaultFileAppender.cs" />
     <Compile Include="Append\File\FileAppender.cs" />
     <Compile Include="Append\File\JsonFileAppender.cs" />
     <Compile Include="Append\File\XmlFileAppender.cs" />
     <Compile Include="Append\LogAppender.cs" />
+    <Compile Include="Append\Event\EventAppender.cs" />
     <Compile Include="Configuration\LogRoot.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="LogFactory.cs" />
