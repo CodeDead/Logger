@@ -20,6 +20,7 @@ namespace CodeDead.Logger.Append
     {
         #region Variables
         private List<LogLevel> _logLevels;
+        internal static readonly List<LogLevel> DefaultLogLevels = new List<LogLevel>{ LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error};
         #endregion
 
         #region Properties
@@ -76,24 +77,6 @@ namespace CodeDead.Logger.Append
         {
             LogLevels = logLevels;
             Enabled = enabled;
-        }
-
-        /// <summary>
-        /// Add a LogLevel to the List of log levels that should be exported
-        /// </summary>
-        /// <param name="logLevel">The LogLevel that should be added</param>
-        public void AddLogLevel(LogLevel logLevel)
-        {
-            _logLevels.Add(logLevel);
-        }
-
-        /// <summary>
-        /// Remove a LogLevel from the List of log levels that should be exported
-        /// </summary>
-        /// <param name="logLevel">The LogLevel that should be removed</param>
-        public void RemoveLogLevel(LogLevel logLevel)
-        {
-            _logLevels.Remove(logLevel);
         }
 
         /// <summary>

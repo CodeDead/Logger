@@ -153,7 +153,7 @@ namespace CodeDead.Logger
         /// <param name="saveFormat">The format in which the configuration data should be stored</param>
         public static void SaveConfiguration(string filePath, SaveFormats saveFormat)
         {
-            LoggerRoot root = new LoggerRoot {Loggers = Loggers};
+            LoggerRoot root = new LoggerRoot { Loggers = Loggers };
             ConfigurationManager.SaveLoggerRoot(filePath, root, saveFormat);
         }
 

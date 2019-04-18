@@ -35,7 +35,7 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         public DefaultFileAppender()
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
         }
 
@@ -45,7 +45,7 @@ namespace CodeDead.Logger.Append.File
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         public DefaultFileAppender(string path)
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
             FilePath = path;
 
@@ -61,7 +61,7 @@ namespace CodeDead.Logger.Append.File
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
         public DefaultFileAppender(string path, bool enabled)
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
             FilePath = path;
 

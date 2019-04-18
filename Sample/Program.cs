@@ -39,7 +39,7 @@ namespace Sample
             logger.Error("Hello error!");
 
             // Warnings will no longer be written to the console but they'll still be saved in the LogRepository
-            consoleWriter.RemoveLogLevel(LogLevel.Warning);
+            consoleWriter.LogLevels.Remove(LogLevel.Warning);
             logger.Warn("This will disable logs from being exported to the console. They'll still be saved in the log repository though!");
             logger.Info("This will still output to the console!");
 

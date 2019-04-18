@@ -43,6 +43,7 @@ Appenders are used for 'appending' logs to a specific output. There are some imp
 | `DefaultFileAppender` | Default implementation of the `FileAppender` that can be used for writing logs to a file using a `Format` that can be customized |
 | `JsonFileAppender` | A spin of the `FileAppender` that can write logs as a JSON file |
 | `XmlFileAppender` | A spin of the `FileAppender` that can write logs as an XML file |
+| `CsvFileAppender` | A spin of the `FileAppender` that can write logs in CSV format. You can adjust the delimiter using the `Delimiter` property |
 | `WindowsEventAppender` | A spin of the `EventAppender` that can write logs to the Windows Event Log |
 
 # TODO
@@ -50,6 +51,7 @@ Appenders are used for 'appending' logs to a specific output. There are some imp
 - [X] Write the code for the DefaultFileAppender
 - [X] Write the code for the XmlFileAppender
 - [X] Write the code for the JsonFileAppender
+- [X] Write the code for the CsvFileAppender
 - [ ] Write the code for the RollingFileAppender
 - [X] Write the code for the WindowsEventAppender
 - [ ] Write documentation
@@ -63,4 +65,4 @@ This library is maintained by CodeDead. You can find more about us using the fol
 * [Facebook](https://facebook.com/deadlinecodedead)
 * [Reddit](https://reddit.com/r/CodeDead/)
 
-We would also like to thank JetBrains for the open source license that they have granted us to work with their wonderful tools such as [Rider](https://jetbrains.com/rider) and [Resharper](https://jetbrains.com/resharper).
+We would also like to thank JetBrains for the open source license that they granted us to work with wonderful tools such as [Rider](https://jetbrains.com/rider) and [Resharper](https://jetbrains.com/resharper).

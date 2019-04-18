@@ -23,7 +23,7 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         public JsonFileAppender()
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _settings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects};
         }
 
@@ -34,7 +34,7 @@ namespace CodeDead.Logger.Append.File
         public JsonFileAppender(string path)
         {
             FilePath = path;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
             Enabled = true;
         }
@@ -47,7 +47,7 @@ namespace CodeDead.Logger.Append.File
         public JsonFileAppender(string path, bool enabled)
         {
             FilePath = path;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
             Enabled = enabled;
         }
@@ -120,7 +120,6 @@ namespace CodeDead.Logger.Append.File
 
             // Add a Log to the LogRoot object
             root.Logs.Add(log);
-
 
             using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
             {

@@ -51,7 +51,7 @@ namespace CodeDead.Logger.Append.Event
         {
             // This should only be used for serialization
             Name = "";
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
 
             EventSource = CreateEventSource();
         }
@@ -64,7 +64,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Enabled = true;
 
             EventSource = CreateEventSource();
@@ -94,7 +94,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Enabled = enabled;
 
             EventSource = CreateEventSource();
@@ -125,7 +125,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             EventSource = eventSource;
             Enabled = true;
 
@@ -142,7 +142,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = format;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             EventSource = eventSource;
             Enabled = true;
 
@@ -194,7 +194,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             EventSource = eventSource;
             Enabled = enabled;
 
@@ -212,7 +212,7 @@ namespace CodeDead.Logger.Append.Event
         {
             Name = name;
             Format = format;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             EventSource = eventSource;
             Enabled = enabled;
 

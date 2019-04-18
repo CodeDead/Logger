@@ -161,7 +161,6 @@ namespace CodeDead.Logger
         {
             List<Log> retrieved = _logRepository.GetLogs(logLevel, context);
             LogsRetrievedEvent?.Invoke(retrieved);
-
             return retrieved;
         }
 

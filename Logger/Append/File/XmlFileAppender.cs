@@ -24,7 +24,7 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         public XmlFileAppender()
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _serializer = new XmlSerializer(typeof(LogRoot));
         }
 
@@ -35,7 +35,7 @@ namespace CodeDead.Logger.Append.File
         public XmlFileAppender(string path)
         {
             FilePath = path;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = true;
         }
@@ -48,7 +48,7 @@ namespace CodeDead.Logger.Append.File
         public XmlFileAppender(string path, bool enabled)
         {
             FilePath = path;
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = enabled;
         }

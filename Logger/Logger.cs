@@ -10,6 +10,11 @@ namespace CodeDead.Logger
     /// </summary>
     public sealed class Logger
     {
+        #region Variables
+
+        private LogManager _logManager;
+        #endregion
+
         #region Properties
         /// <summary>
         /// Property that contains the name of this Logger instance
@@ -20,7 +25,11 @@ namespace CodeDead.Logger
         /// Property that contains the LogManager object for this Logger instance
         /// </summary>
         [XmlElement("LogManager")]
-        public LogManager LogManager { get; set; }
+        public LogManager LogManager
+        {
+            get => _logManager;
+            set => _logManager = value ?? throw new ArgumentNullException(nameof(value));
+        }
 
         /// <summary>
         /// Property that sets whether exceptions will be thrown or not when calling methods.

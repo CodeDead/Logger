@@ -18,6 +18,9 @@ namespace CodeDead.Logger.Configuration
         public List<Log> Logs;
         #endregion
 
+        /// <summary>
+        /// Initialize a new LogRoot
+        /// </summary>
         public LogRoot()
         {
             Logs = new List<Log>();

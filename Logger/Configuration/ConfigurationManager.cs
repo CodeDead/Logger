@@ -85,6 +85,8 @@ namespace CodeDead.Logger.Configuration
                 case SaveFormats.Json:
                     SaveLoggerRootJson(filePath, root);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(saveFormat), saveFormat, null);
             }
         }
 
@@ -108,6 +110,8 @@ namespace CodeDead.Logger.Configuration
                 case SaveFormats.Json:
                     await Task.Run(() => SaveLoggerRootJson(filePath, root));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(saveFormat), saveFormat, null);
             }
         }
 

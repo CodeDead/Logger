@@ -31,7 +31,7 @@ namespace CodeDead.Logger.Append.Console
         public DefaultConsoleAppender()
         {
             Format = DefaultFormat;
-            LogLevels = new List<LogLevel> {LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error};
+            LogLevels = DefaultLogLevels;
             Enabled = true;
         }
 
@@ -41,7 +41,7 @@ namespace CodeDead.Logger.Append.Console
         /// <param name="enabled">True if exporting Log objects to the console should be enabled, otherwise false</param>
         public DefaultConsoleAppender(bool enabled)
         {
-            LogLevels = new List<LogLevel> { LogLevel.Trace, LogLevel.Debug, LogLevel.Info, LogLevel.Warning, LogLevel.Error };
+            LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
             Enabled = enabled;
         }
@@ -75,7 +75,7 @@ namespace CodeDead.Logger.Append.Console
         /// <param name="format">The format in which the Log object should be outputted to the console</param>
         public DefaultConsoleAppender(string format)
         {
-            LogLevels = new List<LogLevel>();
+            LogLevels = DefaultLogLevels;
             Format = format;
             Enabled = true;
         }
