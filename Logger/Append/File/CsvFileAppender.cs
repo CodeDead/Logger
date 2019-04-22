@@ -7,7 +7,7 @@ using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append.File
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="FileAppender" />
     /// <summary>
     /// Sealed class that contains the logic for exporting Log objects to a CSV file
     /// </summary>
@@ -26,6 +26,30 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         [XmlElement("Delimiter")]
         public char Delimiter { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the date should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendDate")]
+        public bool AppendDate { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the content should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContent")]
+        public bool AppendContent { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the context should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContext")]
+        public bool AppendContext { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the LogLevel should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendLogLevel")]
+        public bool AppendLogLevel { get; set; }
         #endregion
 
         /// <summary>
@@ -34,6 +58,8 @@ namespace CodeDead.Logger.Append.File
         public CsvFileAppender()
         {
             LogLevels = DefaultLogLevels;
+            Delimiter = DefaultDelimiter;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -47,6 +73,7 @@ namespace CodeDead.Logger.Append.File
             Delimiter = DefaultDelimiter;
             Enabled = true;
 
+            SetDefaultAppends();
             LoadStream();
         }
 
@@ -62,6 +89,7 @@ namespace CodeDead.Logger.Append.File
             Delimiter = DefaultDelimiter;
             Enabled = enabled;
 
+            SetDefaultAppends();
             LoadStream();
         }
 
@@ -77,6 +105,7 @@ namespace CodeDead.Logger.Append.File
             Delimiter = DefaultDelimiter;
             Enabled = true;
 
+            SetDefaultAppends();
             LoadStream();
         }
 
@@ -93,6 +122,7 @@ namespace CodeDead.Logger.Append.File
             Delimiter = delimiter;
             Enabled = true;
 
+            SetDefaultAppends();
             LoadStream();
         }
 
@@ -109,6 +139,7 @@ namespace CodeDead.Logger.Append.File
             Delimiter = DefaultDelimiter;
             Enabled = enabled;
 
+            SetDefaultAppends();
             LoadStream();
         }
 
@@ -126,7 +157,19 @@ namespace CodeDead.Logger.Append.File
             Delimiter = delimiter;
             Enabled = enabled;
 
+            SetDefaultAppends();
             LoadStream();
+        }
+
+        /// <summary>
+        /// Set the default append properties
+        /// </summary>
+        private void SetDefaultAppends()
+        {
+            AppendDate = true;
+            AppendContent = true;
+            AppendContext = true;
+            AppendLogLevel = true;
         }
 
         /// <summary>
@@ -154,6 +197,35 @@ namespace CodeDead.Logger.Append.File
             return LogLevels.Contains(log.LogLevel);
         }
 
+        /// <summary>
+        /// Format a Log object
+        /// </summary>
+        /// <param name="log">The Log object that needs to be formatted</param>
+        /// <returns>The formatted string containing the contents of a Log object</returns>
+        private string FormatLog(Log log)
+        {
+            string content = "";
+            if (AppendDate) content += log.LogDate;
+
+            if (AppendLogLevel)
+            {
+                if (content.Length > 0) content += Delimiter;
+                content += log.LogLevel;
+            }
+
+            if (AppendContext)
+            {
+                if (content.Length > 0) content += Delimiter;
+                content += "\"" + log.Context + "\"";
+            }
+
+            if (!AppendContent) return content;
+            if (content.Length > 0) content += Delimiter;
+            content += "\"" + log.Content + "\"";
+
+            return content;
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// Export a Log object in CSV format
@@ -164,7 +236,7 @@ namespace CodeDead.Logger.Append.File
             if (!ValidLog(log)) return;
 
             _writing = true;
-            _sw.WriteLine(log.LogDate + Delimiter.ToString() + log.LogLevel + Delimiter + "\"" + log.Context + "\"" + Delimiter + "\"" + log.Content + "\"");
+            _sw.WriteLine(FormatLog(log));
             _sw.Flush();
             _writing = false;
         }
@@ -182,7 +254,7 @@ namespace CodeDead.Logger.Append.File
                 if (!ValidLog(log)) return;
 
                 _writing = true;
-                await _sw.WriteLineAsync(log.LogDate + Delimiter.ToString() + log.LogLevel + Delimiter + "\"" + log.Context + "\"" + Delimiter + "\"" + log.Content + "\"");
+                await _sw.WriteLineAsync(FormatLog(log));
                 await _sw.FlushAsync();
                 _writing = false;
             });

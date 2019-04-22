@@ -7,7 +7,7 @@ using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append.Console
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="ConsoleAppender" />
     /// <summary>
     /// Sealed class that can be used to write Log objects to the console using a default implementation
     /// </summary>
@@ -23,6 +23,30 @@ namespace CodeDead.Logger.Append.Console
         /// </summary>
         [XmlElement("Format")]
         public string Format { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the date should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendDate")]
+        public bool AppendDate { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the content should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContent")]
+        public bool AppendContent { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the context should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContext")]
+        public bool AppendContext { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the LogLevel should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendLogLevel")]
+        public bool AppendLogLevel { get; set; }
         #endregion
 
         /// <summary>
@@ -33,6 +57,7 @@ namespace CodeDead.Logger.Append.Console
             Format = DefaultFormat;
             LogLevels = DefaultLogLevels;
             Enabled = true;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -44,6 +69,7 @@ namespace CodeDead.Logger.Append.Console
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
             Enabled = enabled;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -55,6 +81,7 @@ namespace CodeDead.Logger.Append.Console
             Format = DefaultFormat;
             LogLevels = logLevels;
             Enabled = true;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -67,6 +94,7 @@ namespace CodeDead.Logger.Append.Console
             LogLevels = logLevels;
             Format = DefaultFormat;
             Enabled = enabled;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -78,6 +106,7 @@ namespace CodeDead.Logger.Append.Console
             LogLevels = DefaultLogLevels;
             Format = format;
             Enabled = true;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -90,6 +119,7 @@ namespace CodeDead.Logger.Append.Console
             Format = format;
             LogLevels = logLevels;
             Enabled = true;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -103,16 +133,35 @@ namespace CodeDead.Logger.Append.Console
             Format = format;
             LogLevels = logLevels;
             Enabled = enabled;
+            SetDefaultAppends();
         }
 
         /// <summary>
-        /// Format a Log object into a printable string
+        /// Set the default append properties
         /// </summary>
-        /// <param name="log">The Log object that should be converted into a printable string</param>
+        private void SetDefaultAppends()
+        {
+            AppendDate = true;
+            AppendContent = true;
+            AppendContext = true;
+            AppendLogLevel = true;
+        }
+
+        /// <summary>
+        /// Format a Log object
+        /// </summary>
+        /// <param name="log">The Log object that should be formatted</param>
         /// <returns>The string representation of a Log object using the given format</returns>
         private string FormatLog(Log log)
         {
-            string output = Format
+            string tempFormat = Format;
+
+            if (!AppendDate) tempFormat = tempFormat.Replace("%d", "");
+            if (!AppendLogLevel) tempFormat = tempFormat.Replace("%l", "");
+            if (!AppendContent) tempFormat = tempFormat.Replace("%c", "");
+            if (!AppendContext) tempFormat = tempFormat.Replace("%C", "");
+
+            string output = tempFormat
                 .Replace("%d", log.LogDate.ToString(CultureInfo.InvariantCulture))
                 .Replace("%l", Enum.GetName(typeof(LogLevel), log.LogLevel))
                 .Replace("%c", log.Content)
@@ -141,18 +190,19 @@ namespace CodeDead.Logger.Append.Console
         {
             if (!ValidExport(log)) return;
 
+            string content = FormatLog(log);
             switch (log.LogLevel)
             {
                 case LogLevel.Trace:
-                    System.Diagnostics.Trace.WriteLine(FormatLog(log));
+                    System.Diagnostics.Trace.WriteLine(content);
                     break;
                 case LogLevel.Debug:
-                    System.Diagnostics.Debug.WriteLine(FormatLog(log));
+                    System.Diagnostics.Debug.WriteLine(content);
                     break;
                 case LogLevel.Info:
                 case LogLevel.Warning:
                 case LogLevel.Error:
-                    System.Console.WriteLine(FormatLog(log));
+                    System.Console.WriteLine(content);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -171,18 +221,19 @@ namespace CodeDead.Logger.Append.Console
 
             await Task.Run(async () =>
             {
+                string content = FormatLog(log);
                 switch (log.LogLevel)
                 {
                     case LogLevel.Trace:
-                        System.Diagnostics.Trace.WriteLine(FormatLog(log));
+                        System.Diagnostics.Trace.WriteLine(content);
                         break;
                     case LogLevel.Debug:
-                        System.Diagnostics.Debug.WriteLine(FormatLog(log));
+                        System.Diagnostics.Debug.WriteLine(content);
                         break;
                     case LogLevel.Warning:
                     case LogLevel.Info:
                     case LogLevel.Error:
-                        await System.Console.Out.WriteLineAsync(FormatLog(log));
+                        await System.Console.Out.WriteLineAsync(content);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

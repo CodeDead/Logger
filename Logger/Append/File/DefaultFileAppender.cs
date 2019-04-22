@@ -27,6 +27,30 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         [XmlElement("Format")]
         public string Format { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the date should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendDate")]
+        public bool AppendDate { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the content should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContent")]
+        public bool AppendContent { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the context should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContext")]
+        public bool AppendContext { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the LogLevel should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendLogLevel")]
+        public bool AppendLogLevel { get; set; }
         #endregion
 
         /// <inheritdoc />
@@ -37,6 +61,7 @@ namespace CodeDead.Logger.Append.File
         {
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
+            SetDefaultAppends();
         }
 
         /// <summary>
@@ -49,6 +74,7 @@ namespace CodeDead.Logger.Append.File
             Format = DefaultFormat;
             FilePath = path;
 
+            SetDefaultAppends();
             LoadStream(path);
 
             Enabled = true;
@@ -65,6 +91,7 @@ namespace CodeDead.Logger.Append.File
             Format = DefaultFormat;
             FilePath = path;
 
+            SetDefaultAppends();
             LoadStream(path);
 
             Enabled = enabled;
@@ -79,6 +106,8 @@ namespace CodeDead.Logger.Append.File
         {
             LogLevels = logLevels;
             Format = DefaultFormat;
+
+            SetDefaultAppends();
         }
 
         /// <inheritdoc />
@@ -93,7 +122,10 @@ namespace CodeDead.Logger.Append.File
             LogLevels = logLevels;
             Format = DefaultFormat;
             FilePath = path;
+
+            SetDefaultAppends();
             LoadStream(path);
+
             Enabled = enabled;
         }
 
@@ -109,8 +141,22 @@ namespace CodeDead.Logger.Append.File
             LogLevels = logLevels;
             Format = format;
             FilePath = path;
+
+            SetDefaultAppends();
             LoadStream(path);
+
             Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Set the default append properties
+        /// </summary>
+        private void SetDefaultAppends()
+        {
+            AppendDate = true;
+            AppendContent = true;
+            AppendContext = true;
+            AppendLogLevel = true;
         }
 
         /// <summary>
@@ -137,17 +183,25 @@ namespace CodeDead.Logger.Append.File
         }
 
         /// <summary>
-        /// Format a Log object into a printable string
+        /// Format a Log object
         /// </summary>
-        /// <param name="log">The Log object that should be converted into a printable string</param>
+        /// <param name="log">The Log object that should be formatted</param>
         /// <returns>The string representation of a Log object using the given format</returns>
         private string FormatLog(Log log)
         {
-            string output = Format
+            string tempFormat = Format;
+
+            if (!AppendDate) tempFormat = tempFormat.Replace("%d", "");
+            if (!AppendLogLevel) tempFormat = tempFormat.Replace("%l", "");
+            if (!AppendContent) tempFormat = tempFormat.Replace("%c", "");
+            if (!AppendContext) tempFormat = tempFormat.Replace("%C", "");
+
+            string output = tempFormat
                 .Replace("%d", log.LogDate.ToString(CultureInfo.InvariantCulture))
                 .Replace("%l", Enum.GetName(typeof(LogLevel), log.LogLevel))
                 .Replace("%c", log.Content)
                 .Replace("%C", log.Context);
+
             return output;
         }
 

@@ -9,7 +9,7 @@ using CodeDead.Logger.Logging;
 
 namespace CodeDead.Logger.Append.Event
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="EventAppender" />
     /// <summary>
     /// Sealed class that can be used to handle writing Log objects to the Windows Event Log
     /// </summary>
@@ -42,6 +42,30 @@ namespace CodeDead.Logger.Append.Event
         /// </summary>
         [XmlElement("Format")]
         public string Format { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the date should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendDate")]
+        public bool AppendDate { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the content should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContent")]
+        public bool AppendContent { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the context should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendContext")]
+        public bool AppendContext { get; set; }
+
+        /// <summary>
+        /// Property that sets whether the LogLevel should be appended when exporting a Log object
+        /// </summary>
+        [XmlElement("AppendLogLevel")]
+        public bool AppendLogLevel { get; set; }
         #endregion
 
         /// <summary>
@@ -67,6 +91,7 @@ namespace CodeDead.Logger.Append.Event
             LogLevels = DefaultLogLevels;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -82,6 +107,7 @@ namespace CodeDead.Logger.Append.Event
             LogLevels = logLevels;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -97,6 +123,7 @@ namespace CodeDead.Logger.Append.Event
             LogLevels = DefaultLogLevels;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -113,6 +140,7 @@ namespace CodeDead.Logger.Append.Event
             LogLevels = logLevels;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -129,6 +157,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -146,6 +175,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -163,6 +193,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -181,6 +212,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = true;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -198,6 +230,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -216,6 +249,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -234,6 +268,7 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
         }
 
@@ -253,7 +288,19 @@ namespace CodeDead.Logger.Append.Event
             EventSource = eventSource;
             Enabled = enabled;
 
+            SetDefaultAppends();
             EventSource = CreateEventSource();
+        }
+
+        /// <summary>
+        /// Set the default append properties
+        /// </summary>
+        private void SetDefaultAppends()
+        {
+            AppendDate = true;
+            AppendContent = true;
+            AppendContext = true;
+            AppendLogLevel = true;
         }
 
         /// <summary>
@@ -284,13 +331,20 @@ namespace CodeDead.Logger.Append.Event
         }
 
         /// <summary>
-        /// Format a Log object into a printable string
+        /// Format a Log object
         /// </summary>
-        /// <param name="log">The Log object that should be converted into a printable string</param>
+        /// <param name="log">The Log object that should be formatted</param>
         /// <returns>The string representation of a Log object using the given format</returns>
         private string FormatLog(Log log)
         {
-            string output = Format
+            string tempFormat = Format;
+
+            if (!AppendDate) tempFormat = tempFormat.Replace("%d", "");
+            if (!AppendLogLevel) tempFormat = tempFormat.Replace("%l", "");
+            if (!AppendContent) tempFormat = tempFormat.Replace("%c", "");
+            if (!AppendContext) tempFormat = tempFormat.Replace("%C", "");
+
+            string output = tempFormat
                 .Replace("%d", log.LogDate.ToString(CultureInfo.InvariantCulture))
                 .Replace("%l", Enum.GetName(typeof(LogLevel), log.LogLevel))
                 .Replace("%c", log.Content)
@@ -321,8 +375,8 @@ namespace CodeDead.Logger.Append.Event
             using (EventLog eventLog = new EventLog(Name))
             {
                 eventLog.Source = EventSource;
-
                 EventLogEntryType entryType;
+
                 switch (log.LogLevel)
                 {
                     case LogLevel.Trace:
