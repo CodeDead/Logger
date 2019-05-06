@@ -7,7 +7,7 @@ This library is available as a NuGet package:
 #TODO
 
 ## Dependencies
-* [.NET Framework 4.7.2](https://dotnet.microsoft.com/download/dotnet-framework/net472)
+* [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
 * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 
 ## Example usage
