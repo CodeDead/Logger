@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using CodeDead.Logger.Configuration;
 using CodeDead.Logger.Logging;
-using Newtonsoft.Json;
 
 namespace CodeDead.Logger.Append.File
 {
@@ -15,7 +15,7 @@ namespace CodeDead.Logger.Append.File
     public sealed class JsonFileAppender : FileAppender
     {
         #region Variables
-        private readonly JsonSerializerSettings _settings;
+        private readonly JavaScriptSerializer _serializer;
         #endregion
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace CodeDead.Logger.Append.File
         public JsonFileAppender()
         {
             LogLevels = DefaultLogLevels;
-            _settings = new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Objects};
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = true;
         }
 
@@ -48,7 +48,7 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = enabled;
         }
 
@@ -61,7 +61,7 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = true;
         }
 
@@ -75,7 +75,7 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
-            _settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = enabled;
         }
 
@@ -116,7 +116,7 @@ namespace CodeDead.Logger.Append.File
                 // Ignored
             }
 
-            LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : JsonConvert.DeserializeObject<LogRoot>(readContents, _settings);
+            LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
 
             // Add a Log to the LogRoot object
             root.Logs.Add(log);
@@ -124,7 +124,7 @@ namespace CodeDead.Logger.Append.File
             using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
             {
                 // Convert it back into a JSON
-                string json = JsonConvert.SerializeObject(root, _settings);
+                string json = _serializer.Serialize(root);
 
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -162,7 +162,7 @@ namespace CodeDead.Logger.Append.File
                     // Ignored
                 }
 
-                LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : JsonConvert.DeserializeObject<LogRoot>(readContents, _settings);
+                LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
 
                 // Add a Log to the LogRoot object
                 root.Logs.Add(log);
@@ -171,7 +171,7 @@ namespace CodeDead.Logger.Append.File
                 using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 {
                     // Convert it back into a JSON
-                    string json = JsonConvert.SerializeObject(root, _settings);
+                    string json = _serializer.Serialize(root);
 
                     using (StreamWriter sw = new StreamWriter(fs))
                     {

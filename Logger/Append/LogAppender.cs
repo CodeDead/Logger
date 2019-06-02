@@ -44,7 +44,7 @@ namespace CodeDead.Logger.Append
         /// <summary>
         /// Initialize a new LogAppender object
         /// </summary>
-        public LogAppender()
+        protected LogAppender()
         {
             LogLevels = new List<LogLevel>();
         }
@@ -53,7 +53,7 @@ namespace CodeDead.Logger.Append
         /// Initialize a new LogAppender object
         /// </summary>
         /// <param name="enabled">True if exporting logs should be enabled, otherwise false</param>
-        public LogAppender(bool enabled)
+        protected LogAppender(bool enabled)
         {
             LogLevels = new List<LogLevel>();
             Enabled = enabled;
@@ -63,7 +63,7 @@ namespace CodeDead.Logger.Append
         /// Initialize a new LogAppender object
         /// </summary>
         /// <param name="logLevels">The List of log levels that should be exported</param>
-        public LogAppender(List<LogLevel> logLevels)
+        protected LogAppender(List<LogLevel> logLevels)
         {
             LogLevels = logLevels;
         }
@@ -73,7 +73,7 @@ namespace CodeDead.Logger.Append
         /// </summary>
         /// <param name="logLevels">The List of log levels that should be exported</param>
         /// <param name="enabled">True if exporting logs should be enabled, otherwise false</param>
-        public LogAppender(List<LogLevel> logLevels, bool enabled)
+        protected LogAppender(List<LogLevel> logLevels, bool enabled)
         {
             LogLevels = logLevels;
             Enabled = enabled;

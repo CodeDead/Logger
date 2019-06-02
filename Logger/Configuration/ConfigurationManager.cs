@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Xml;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
 
 namespace CodeDead.Logger.Configuration
 {
@@ -147,8 +147,8 @@ namespace CodeDead.Logger.Configuration
         /// <param name="root">The LoggerRoot object that should be saved</param>
         private static void SaveLoggerRootJson(string filePath, LoggerRoot root)
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
-            string json = JsonConvert.SerializeObject(root, settings);
+            JavaScriptSerializer serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+            string json = serializer.Serialize(root);
             using (StreamWriter sw = new StreamWriter(filePath))
             {
                 sw.Write(json);
@@ -170,14 +170,14 @@ namespace CodeDead.Logger.Configuration
 
             if (isJson)
             {
-                JsonSerializerSettings settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects };
-                return JsonConvert.DeserializeObject<LoggerRoot>(data, settings);
+                JavaScriptSerializer jsSerializer = new JavaScriptSerializer(new SimpleTypeResolver());
+                return jsSerializer.Deserialize<LoggerRoot>(data);
             }
 
-            XmlSerializer serializer = new XmlSerializer(typeof(LoggerRoot));
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(LoggerRoot));
             using (TextReader reader = new StringReader(data))
             {
-                return (LoggerRoot)serializer.Deserialize(reader);
+                return (LoggerRoot)xmlSerializer.Deserialize(reader);
             }
         }
 

@@ -106,14 +106,11 @@ namespace CodeDead.Logger
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public static async Task LoadFromConfigurationAsync(string filePath)
         {
-            await Task.Run(async () =>
+            LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
+            foreach (Logger logger in root.Loggers)
             {
-                LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
-                foreach (Logger logger in root.Loggers)
-                {
-                    AddLogger(logger);
-                }
-            });
+                AddLogger(logger);
+            }
         }
 
         /// <summary>
@@ -136,14 +133,11 @@ namespace CodeDead.Logger
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public static async Task LoadFromConfigurationAsync(byte[] configuration)
         {
-            await Task.Run(async () =>
+            LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(configuration);
+            foreach (Logger logger in root.Loggers)
             {
-                LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(configuration);
-                foreach (Logger logger in root.Loggers)
-                {
-                    AddLogger(logger);
-                }
-            });
+                AddLogger(logger);
+            }
         }
 
         /// <summary>
@@ -165,11 +159,8 @@ namespace CodeDead.Logger
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public static async Task SaveConfigurationAsync(string filePath, SaveFormats saveFormat)
         {
-            await Task.Run(async () =>
-            {
-                LoggerRoot root = new LoggerRoot { Loggers = Loggers };
-                await ConfigurationManager.SaveLoggerRootAsync(filePath, root, saveFormat);
-            });
+            LoggerRoot root = new LoggerRoot { Loggers = Loggers };
+            await ConfigurationManager.SaveLoggerRootAsync(filePath, root, saveFormat);
         }
     }
 }
