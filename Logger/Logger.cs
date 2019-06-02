@@ -32,13 +32,6 @@ namespace CodeDead.Logger
         }
 
         /// <summary>
-        /// Property that sets whether exceptions will be thrown or not when calling methods.
-        /// Invalid property exceptions will still be thrown
-        /// </summary>
-        [XmlElement("ThrowExceptions")]
-        public bool ThrowExceptions { get; set; }
-
-        /// <summary>
         /// Property that sets whether the logging capabilities are enabled or not
         /// </summary>
         [XmlElement("Enabled")]
@@ -111,7 +104,6 @@ namespace CodeDead.Logger
         private void EnableDefaults()
         {
             Enabled = true;
-            ThrowExceptions = false;
 
             TraceEnabled = true;
             DebugEnabled = true;
@@ -128,15 +120,7 @@ namespace CodeDead.Logger
         /// <param name="logLevel">The LogLevel that applies to the Log object</param>
         private void AddLog(string content, string context, LogLevel logLevel)
         {
-            try
-            {
-                LogManager.AddLog(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
-            }
-            catch (Exception ex)
-            {
-                if (ThrowExceptions) throw;
-                Console.WriteLine(ex);
-            }
+            LogManager.AddLog(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
         }
 
         /// <summary>
@@ -148,15 +132,7 @@ namespace CodeDead.Logger
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         private async Task AddLogAsync(string content, string context, LogLevel logLevel)
         {
-            try
-            {
-                await LogManager.AddLogAsync(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
-            }
-            catch (Exception ex)
-            {
-                if (ThrowExceptions) throw;
-                await Console.Out.WriteLineAsync(ex.Message + Environment.NewLine + ex.StackTrace);
-            }
+            await LogManager.AddLogAsync(context != null ? new Log(content, context, logLevel) : new Log(content, logLevel));
         }
 
         /// <summary>

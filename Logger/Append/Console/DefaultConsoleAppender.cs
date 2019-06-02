@@ -177,8 +177,7 @@ namespace CodeDead.Logger.Append.Console
         private bool ValidExport(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <inheritdoc />
@@ -196,7 +195,7 @@ namespace CodeDead.Logger.Append.Console
                 case LogLevel.Trace:
                     System.Diagnostics.Trace.WriteLine(content);
                     break;
-                case LogLevel.Debug:
+                default:
                     System.Diagnostics.Debug.WriteLine(content);
                     break;
                 case LogLevel.Info:
@@ -204,8 +203,6 @@ namespace CodeDead.Logger.Append.Console
                 case LogLevel.Error:
                     System.Console.WriteLine(content);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -227,7 +224,7 @@ namespace CodeDead.Logger.Append.Console
                     case LogLevel.Trace:
                         System.Diagnostics.Trace.WriteLine(content);
                         break;
-                    case LogLevel.Debug:
+                    default:
                         System.Diagnostics.Debug.WriteLine(content);
                         break;
                     case LogLevel.Warning:
@@ -235,8 +232,6 @@ namespace CodeDead.Logger.Append.Console
                     case LogLevel.Error:
                         await System.Console.Out.WriteLineAsync(content);
                         break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
                 }
             });
         }

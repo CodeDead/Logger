@@ -88,8 +88,7 @@ namespace CodeDead.Logger.Append.File
         private bool ValidLog(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <inheritdoc />
@@ -116,42 +115,57 @@ namespace CodeDead.Logger.Append.File
             {
                 // Ignored
             }
-
-
-            LogRoot root = null;
+            
+            LogRoot root;
             if (!string.IsNullOrEmpty(readContents))
             {
-                // Convert the XML into a LogRoot object
-                using (TextReader reader = new StringReader(readContents))
+                try
                 {
-                    root = (LogRoot)_serializer.Deserialize(reader);
+                    // Convert the XML into a LogRoot object
+                    using (TextReader reader = new StringReader(readContents))
+                    {
+                        root = (LogRoot) _serializer.Deserialize(reader);
+                    }
+                }
+                catch (Exception)
+                {
+                    if (ThrowErrors) throw;
+                    return;
                 }
             }
-
-            if (root == null) root = new LogRoot();
+            else
+            {
+                root = new LogRoot();
+            }
 
             // Add a Log to the LogRoot object
             root.Logs.Add(log);
 
-
-            using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+            try
             {
-                string xml;
-                using (StringWriter sww = new StringWriter())
+                using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    using (XmlWriter writer = XmlWriter.Create(sww))
+                    string xml;
+                    using (StringWriter sww = new StringWriter())
                     {
-                        // Convert the object back to XML
-                        _serializer.Serialize(writer, root);
-                        xml = sww.ToString();
+                        using (XmlWriter writer = XmlWriter.Create(sww))
+                        {
+                            // Convert the object back to XML
+                            _serializer.Serialize(writer, root);
+                            xml = sww.ToString();
+                        }
+                    }
+
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.Write(xml);
+                        sw.Flush();
                     }
                 }
-
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    sw.Write(xml);
-                    sw.Flush();
-                }
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
             }
         }
 
@@ -163,9 +177,9 @@ namespace CodeDead.Logger.Append.File
         /// <returns>The Task object that is associated with this method</returns>
         public override async Task ExportLogAsync(Log log)
         {
+            if (!ValidLog(log)) return;
             await Task.Run(async () =>
             {
-                if (!ValidLog(log)) return;
                 string readContents = null;
                 try
                 {
@@ -182,43 +196,57 @@ namespace CodeDead.Logger.Append.File
                 {
                     // Ignored
                 }
-
-
-                LogRoot root = null;
+                
+                LogRoot root;
                 if (!string.IsNullOrEmpty(readContents))
                 {
-                    // Convert the XML into a LogRoot object
-                    using (TextReader reader = new StringReader(readContents))
+                    try
                     {
-                        root = (LogRoot)_serializer.Deserialize(reader);
+                        // Convert the XML into a LogRoot object
+                        using (TextReader reader = new StringReader(readContents))
+                        {
+                            root = (LogRoot)_serializer.Deserialize(reader);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        if (ThrowErrors) throw;
+                        return;
                     }
                 }
-
-                if (root == null) root = new LogRoot();
+                else
+                {
+                    root = new LogRoot();
+                }
 
                 // Add a Log to the LogRoot object
                 root.Logs.Add(log);
 
-
-                using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+                try
                 {
-
-                    string xml;
-                    using (StringWriter sww = new StringWriter())
+                    using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                     {
-                        using (XmlWriter writer = XmlWriter.Create(sww))
+                        string xml;
+                        using (StringWriter sww = new StringWriter())
                         {
-                            // Convert the object back to XML
-                            _serializer.Serialize(writer, root);
-                            xml = sww.ToString();
+                            using (XmlWriter writer = XmlWriter.Create(sww))
+                            {
+                                // Convert the object back to XML
+                                _serializer.Serialize(writer, root);
+                                xml = sww.ToString();
+                            }
+                        }
+
+                        using (StreamWriter sw = new StreamWriter(fs))
+                        {
+                            await sw.WriteAsync(xml);
+                            await sw.FlushAsync();
                         }
                     }
-
-                    using (StreamWriter sw = new StreamWriter(fs))
-                    {
-                        await sw.WriteAsync(xml);
-                        await sw.FlushAsync();
-                    }
+                }
+                catch (Exception)
+                {
+                    if (ThrowErrors) throw;
                 }
             });
         }

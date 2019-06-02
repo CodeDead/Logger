@@ -87,8 +87,7 @@ namespace CodeDead.Logger.Append.File
         private bool ValidLog(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <inheritdoc />
@@ -116,21 +115,37 @@ namespace CodeDead.Logger.Append.File
                 // Ignored
             }
 
-            LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
+            LogRoot root;
+            try
+            {
+                root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
+            }
+            catch (ArgumentException)
+            {
+                if (ThrowErrors) throw;
+                return;
+            }
 
             // Add a Log to the LogRoot object
             root.Logs.Add(log);
 
-            using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+            try
             {
-                // Convert it back into a JSON
-                string json = _serializer.Serialize(root);
-
-                using (StreamWriter sw = new StreamWriter(fs))
+                using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    sw.Write(json);
-                    sw.Flush();
+                    // Convert it back into a JSON
+                    string json = _serializer.Serialize(root);
+
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        sw.Write(json);
+                        sw.Flush();
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
             }
         }
 
@@ -142,9 +157,9 @@ namespace CodeDead.Logger.Append.File
         /// <returns>The Task object that is associated with this method</returns>
         public override async Task ExportLogAsync(Log log)
         {
+            if (!ValidLog(log)) return;
             await Task.Run(async () =>
             {
-                if (!ValidLog(log)) return;
                 string readContents = null;
                 try
                 {
@@ -162,22 +177,37 @@ namespace CodeDead.Logger.Append.File
                     // Ignored
                 }
 
-                LogRoot root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
+                LogRoot root;
+                try
+                {
+                    root = string.IsNullOrEmpty(readContents) ? new LogRoot() : _serializer.Deserialize<LogRoot>(readContents);
+                }
+                catch (ArgumentException)
+                {
+                    if (ThrowErrors) throw;
+                    return;
+                }
 
                 // Add a Log to the LogRoot object
                 root.Logs.Add(log);
 
-
-                using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+                try
                 {
-                    // Convert it back into a JSON
-                    string json = _serializer.Serialize(root);
-
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                     {
-                        await sw.WriteAsync(json);
-                        await sw.FlushAsync();
+                        // Convert it back into a JSON
+                        string json = _serializer.Serialize(root);
+
+                        using (StreamWriter sw = new StreamWriter(fs))
+                        {
+                            await sw.WriteAsync(json);
+                            await sw.FlushAsync();
+                        }
                     }
+                }
+                catch (Exception)
+                {
+                    if (ThrowErrors) throw;
                 }
             });
         }

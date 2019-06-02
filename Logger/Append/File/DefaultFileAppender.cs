@@ -165,9 +165,15 @@ namespace CodeDead.Logger.Append.File
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         private void LoadStream(string path)
         {
-            _fileStream = System.IO.File.Open(path, FileMode.Append, FileAccess.Write, FileShare.Read);
-            _streamWriter = new StreamWriter(_fileStream);
-            _writing = false;
+            try
+            {
+                _fileStream = System.IO.File.Open(path, FileMode.Append, FileAccess.Write, FileShare.Read);
+                _streamWriter = new StreamWriter(_fileStream);
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
+            }
         }
 
         /// <summary>
@@ -178,8 +184,7 @@ namespace CodeDead.Logger.Append.File
         private bool ValidExport(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <summary>
@@ -214,9 +219,20 @@ namespace CodeDead.Logger.Append.File
         {
             if (!ValidExport(log)) return;
             _writing = true;
-            _streamWriter?.WriteLine(FormatLog(log));
-            _streamWriter?.Flush();
-            _writing = false;
+            try
+            {
+                if (_streamWriter == null) return;
+                _streamWriter.WriteLine(FormatLog(log));
+                _streamWriter.Flush();
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
+            }
+            finally
+            {
+                _writing = false;
+            }
         }
 
         /// <inheritdoc />
@@ -227,14 +243,24 @@ namespace CodeDead.Logger.Append.File
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public override async Task ExportLogAsync(Log log)
         {
+            if (!ValidExport(log)) return;
             await Task.Run(async () =>
             {
-                if (!ValidExport(log)) return;
-                if (_streamWriter != null)
+                _writing = true;
+                try
                 {
-                    _writing = true;
-                    await _streamWriter.WriteLineAsync(FormatLog(log));
-                    await _streamWriter.FlushAsync();
+                    if (_streamWriter != null)
+                    {
+                        await _streamWriter.WriteLineAsync(FormatLog(log));
+                        await _streamWriter.FlushAsync();
+                    }
+                }
+                catch (Exception)
+                {
+                    if (ThrowErrors) throw;
+                }
+                finally
+                {
                     _writing = false;
                 }
             });

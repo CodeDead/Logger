@@ -360,8 +360,7 @@ namespace CodeDead.Logger.Append.Event
         private bool ValidLog(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <inheritdoc />
@@ -372,29 +371,33 @@ namespace CodeDead.Logger.Append.Event
         public override void ExportLog(Log log)
         {
             if (!ValidLog(log)) return;
-            using (EventLog eventLog = new EventLog(Name))
+
+            try
             {
-                eventLog.Source = EventSource;
-                EventLogEntryType entryType;
-
-                switch (log.LogLevel)
+                using (EventLog eventLog = new EventLog(Name))
                 {
-                    case LogLevel.Trace:
-                    case LogLevel.Debug:
-                    case LogLevel.Info:
-                        entryType = EventLogEntryType.Information;
-                        break;
-                    case LogLevel.Warning:
-                        entryType = EventLogEntryType.Warning;
-                        break;
-                    case LogLevel.Error:
-                        entryType = EventLogEntryType.Error;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    eventLog.Source = EventSource;
+                    EventLogEntryType entryType;
 
-                eventLog.WriteEntry(FormatLog(log), entryType);
+                    switch (log.LogLevel)
+                    {
+                        default:
+                            entryType = EventLogEntryType.Information;
+                            break;
+                        case LogLevel.Warning:
+                            entryType = EventLogEntryType.Warning;
+                            break;
+                        case LogLevel.Error:
+                            entryType = EventLogEntryType.Error;
+                            break;
+                    }
+
+                    eventLog.WriteEntry(FormatLog(log), entryType);
+                }
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
             }
         }
 

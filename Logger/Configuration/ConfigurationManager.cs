@@ -30,11 +30,8 @@ namespace CodeDead.Logger.Configuration
         /// <returns>The LoggerRoot object that was built using the configuration file</returns>
         internal static async Task<LoggerRoot> LoadLoggerRootAsync(string filePath)
         {
-            return await Task.Run(() =>
-            {
-                string data = ReadFile(filePath);
-                return LoadConfiguration(data);
-            });
+            string data = await ReadFileAsync(filePath);
+            return await Task.Run(() => LoadConfiguration(data));
         }
 
         /// <summary>
@@ -216,6 +213,23 @@ namespace CodeDead.Logger.Configuration
             using (StreamReader streamReader = new StreamReader(filePath, true))
             {
                 readContents = streamReader.ReadToEnd();
+            }
+            return readContents;
+        }
+
+        /// <summary>
+        /// Asynchronously read the contents of a file into a string
+        /// </summary>
+        /// <param name="filePath">The path of the file that should be read</param>
+        /// <returns>The contents of a file, if applicable</returns>
+        private static async Task<string> ReadFileAsync(string filePath)
+        {
+            if (!File.Exists(filePath)) throw new FileNotFoundException(filePath);
+
+            string readContents;
+            using (StreamReader streamReader = new StreamReader(filePath, true))
+            {
+                readContents = await streamReader.ReadToEndAsync();
             }
             return readContents;
         }

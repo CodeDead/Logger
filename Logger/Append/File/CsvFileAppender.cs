@@ -177,12 +177,15 @@ namespace CodeDead.Logger.Append.File
         /// </summary>
         private void LoadStream()
         {
-            while (_writing)
+            try
             {
-                // Wait
+                _fs = System.IO.File.Open(FilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                _sw = new StreamWriter(_fs);
             }
-            _fs = System.IO.File.Open(FilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-            _sw = new StreamWriter(_fs);
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
+            }
         }
 
         /// <summary>
@@ -193,8 +196,7 @@ namespace CodeDead.Logger.Append.File
         private bool ValidLog(Log log)
         {
             if (!Enabled) return false;
-            if (log == null) throw new ArgumentNullException(nameof(log));
-            return LogLevels.Contains(log.LogLevel);
+            return log != null && LogLevels.Contains(log.LogLevel);
         }
 
         /// <summary>
@@ -236,9 +238,20 @@ namespace CodeDead.Logger.Append.File
             if (!ValidLog(log)) return;
 
             _writing = true;
-            _sw.WriteLine(FormatLog(log));
-            _sw.Flush();
-            _writing = false;
+            try
+            {
+                if (_sw == null) return;
+                _sw.WriteLine(FormatLog(log));
+                _sw.Flush();
+            }
+            catch (Exception)
+            {
+                if (ThrowErrors) throw;
+            }
+            finally
+            {
+                _writing = false;
+            }
         }
 
         /// <inheritdoc />
@@ -249,14 +262,26 @@ namespace CodeDead.Logger.Append.File
         /// <returns>The Task object that is associated with this asynchronous method</returns>
         public override async Task ExportLogAsync(Log log)
         {
+            if (!ValidLog(log)) return;
             await Task.Run(async () =>
             {
-                if (!ValidLog(log)) return;
-
                 _writing = true;
-                await _sw.WriteLineAsync(FormatLog(log));
-                await _sw.FlushAsync();
-                _writing = false;
+                try
+                {
+                    if (_sw != null)
+                    {
+                        await _sw.WriteLineAsync(FormatLog(log));
+                        await _sw.FlushAsync();
+                    }
+                }
+                catch (Exception)
+                {
+                    if (ThrowErrors) throw;
+                }
+                finally
+                {
+                    _writing = false;
+                }
             });
         }
 

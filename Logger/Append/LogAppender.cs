@@ -29,7 +29,11 @@ namespace CodeDead.Logger.Append
         /// </summary>
         [XmlElement("Enabled")]
         public bool Enabled { get; set; }
-
+        /// <summary>
+        /// Property that sets whether exceptions should be thrown or not
+        /// </summary>
+        [XmlElement("ThrowErrors")]
+        public bool ThrowErrors { get; set; }
         /// <summary>
         /// The List of log levels that should be exported
         /// </summary>
