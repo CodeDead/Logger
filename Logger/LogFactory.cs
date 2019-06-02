@@ -95,7 +95,7 @@ namespace CodeDead.Logger
             LoggerRoot root = ConfigurationManager.LoadLoggerRoot(filePath);
             foreach (Logger logger in root.Loggers)
             {
-                AddLogger(logger);
+                Loggers.Add(logger);
             }
         }
 
@@ -109,7 +109,7 @@ namespace CodeDead.Logger
             LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(filePath);
             foreach (Logger logger in root.Loggers)
             {
-                AddLogger(logger);
+                Loggers.Add(logger);
             }
         }
 
@@ -122,7 +122,7 @@ namespace CodeDead.Logger
             LoggerRoot root = ConfigurationManager.LoadLoggerRoot(configuration);
             foreach (Logger logger in root.Loggers)
             {
-                AddLogger(logger);
+                Loggers.Add(logger);
             }
         }
 
@@ -136,7 +136,7 @@ namespace CodeDead.Logger
             LoggerRoot root = await ConfigurationManager.LoadLoggerRootAsync(configuration);
             foreach (Logger logger in root.Loggers)
             {
-                AddLogger(logger);
+                Loggers.Add(logger);
             }
         }
 

@@ -3,8 +3,7 @@ This repository contains a simple, yet extensible logging library for .NET Frame
 files at the same time, writing your own appending logic and even writing logs asynchonously. It is highly recommended to look at the code samples to get a general idea of the workflow.
 
 ## NuGet
-This library is available as a NuGet package:
-#TODO
+This library is available as a NuGet package: #TODO
 
 ## Dependencies
 * [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
@@ -34,7 +33,7 @@ logger.Error("Hello error!");
 ```
 
 ## Appenders
-Appenders are used for 'appending' logs to a specific output. There are some implementations of those available to you already. They are:
+Appenders are used for 'appending' logs to a specific output:
 
 | Class | Description |
 | --- | --- |
@@ -45,14 +44,22 @@ Appenders are used for 'appending' logs to a specific output. There are some imp
 | `CsvFileAppender` | A spin of the `FileAppender` that can write logs in CSV format. You can adjust the delimiter using the `Delimiter` property |
 | `WindowsEventAppender` | A spin of the `EventAppender` that can write logs to the Windows Event Log |
 
+### FileConfiguration
+`FileConfiguration` implementations can be used to extend the capabilities of `FileAppender` implementations:
+
+| Class | Description |
+| --- | --- |
+| `FileArchiver` | Implementation of the `FileConfiguration` class that can be used to archive log files using a `ZipPath` that can be customized |
+| `FileMover` | Implementation of the `FileConfiguration` class that can be used to move log files to a `Directory` that can be customized |
+
 # TODO
 - [X] Allow loggers to be read/exported to/from a file (JSON/XML)
 - [X] Write the code for the DefaultFileAppender
 - [X] Write the code for the XmlFileAppender
 - [X] Write the code for the JsonFileAppender
 - [X] Write the code for the CsvFileAppender
-- [ ] Write the code for the RollingFileAppender
 - [X] Write the code for the WindowsEventAppender
+- [ ] Implement the FileConfiguration classes
 - [ ] Write documentation
 - [X] Write contribution guidelines
 - [ ] Publish on NuGet

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml.Serialization;
+using CodeDead.Logger.Append.Configuration.File;
 
 namespace CodeDead.Logger.Append.File
 {
@@ -27,6 +28,12 @@ namespace CodeDead.Logger.Append.File
             get => _filePath;
             set => _filePath = value ?? throw new ArgumentNullException(nameof(value));
         }
+
+        /// <summary>
+        /// Property that contains the FileConfiguration
+        /// </summary>
+        [XmlElement("FileConfiguration")]
+        public FileConfiguration FileConfiguration { get; set; }
         #endregion
     }
 }
