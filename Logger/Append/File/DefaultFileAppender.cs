@@ -70,12 +70,12 @@ namespace CodeDead.Logger.Append.File
         /// <param name="path">The path of the file that should be used to write Log objects to</param>
         public DefaultFileAppender(string path)
         {
+            FilePath = path;
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
-            FilePath = path;
 
             SetDefaultAppends();
-            LoadStream(path);
+            LoadStream();
 
             Enabled = true;
         }
@@ -87,12 +87,12 @@ namespace CodeDead.Logger.Append.File
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
         public DefaultFileAppender(string path, bool enabled)
         {
+            FilePath = path;
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
-            FilePath = path;
 
             SetDefaultAppends();
-            LoadStream(path);
+            LoadStream();
 
             Enabled = enabled;
         }
@@ -119,12 +119,12 @@ namespace CodeDead.Logger.Append.File
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
         public DefaultFileAppender(string path, List<LogLevel> logLevels, bool enabled)
         {
+            FilePath = path;
             LogLevels = logLevels;
             Format = DefaultFormat;
-            FilePath = path;
 
             SetDefaultAppends();
-            LoadStream(path);
+            LoadStream();
 
             Enabled = enabled;
         }
@@ -138,12 +138,12 @@ namespace CodeDead.Logger.Append.File
         /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
         public DefaultFileAppender(string path, List<LogLevel> logLevels, string format, bool enabled)
         {
+            FilePath = path;
             LogLevels = logLevels;
             Format = format;
-            FilePath = path;
 
             SetDefaultAppends();
-            LoadStream(path);
+            LoadStream();
 
             Enabled = enabled;
         }
@@ -162,12 +162,11 @@ namespace CodeDead.Logger.Append.File
         /// <summary>
         /// Load the FileStream and StreamWriter
         /// </summary>
-        /// <param name="path">The path of the file that should be used to write Log objects to</param>
-        private void LoadStream(string path)
+        private void LoadStream()
         {
             try
             {
-                _fileStream = System.IO.File.Open(path, FileMode.Append, FileAccess.Write, FileShare.Read);
+                _fileStream = System.IO.File.Open(FilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
                 _streamWriter = new StreamWriter(_fileStream);
             }
             catch (Exception)
@@ -223,7 +222,7 @@ namespace CodeDead.Logger.Append.File
             {
                 if (_streamWriter == null && !string.IsNullOrEmpty(FilePath))
                 {
-                    LoadStream(FilePath);
+                    LoadStream();
                 }
 
                 if (_streamWriter == null) return;
@@ -256,7 +255,7 @@ namespace CodeDead.Logger.Append.File
                 {
                     if (_streamWriter == null && !string.IsNullOrEmpty(FilePath))
                     {
-                        LoadStream(FilePath);
+                        LoadStream();
                     }
 
                     if (_streamWriter == null) return;

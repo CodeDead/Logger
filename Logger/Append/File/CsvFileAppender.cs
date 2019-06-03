@@ -240,6 +240,11 @@ namespace CodeDead.Logger.Append.File
             _writing = true;
             try
             {
+                if (_sw == null && !string.IsNullOrEmpty(FilePath))
+                {
+                    LoadStream();
+                }
+
                 if (_sw == null) return;
                 _sw.WriteLine(FormatLog(log));
                 _sw.Flush();
@@ -268,11 +273,14 @@ namespace CodeDead.Logger.Append.File
                 _writing = true;
                 try
                 {
-                    if (_sw != null)
+                    if (_sw != null && !string.IsNullOrEmpty(FilePath))
                     {
-                        await _sw.WriteLineAsync(FormatLog(log));
-                        await _sw.FlushAsync();
+                        LoadStream();
                     }
+
+                    if (_sw == null) return;
+                    await _sw.WriteLineAsync(FormatLog(log));
+                    await _sw.FlushAsync();
                 }
                 catch (Exception)
                 {
