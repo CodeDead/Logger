@@ -68,11 +68,9 @@ namespace Sample
             Logger logger2 = LogFactory.GenerateLogger();
 
             logger2.LogManager.LogAddedEvent += OnLogAddedEvent;
-            logger2.LogManager.LogRemovedEvent += OnLogRemovedEvent;
 
-            Log toDelete = new Log("This is going to be deleted", LogLevel.Debug);
+            Log toDelete = new Log("This is going to be added", LogLevel.Debug);
             logger2.LogManager.AddLog(toDelete);
-            logger2.LogManager.RemoveLog(toDelete);
 
             // Example of saving configuration to an XML file
             LogFactory.SaveConfiguration(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\settings.xml", SaveFormats.Xml);
@@ -93,16 +91,6 @@ namespace Sample
             loadedLogger[0].Info("But this will!");
 
             Console.ReadLine();
-        }
-
-        /// <summary>
-        /// Method that is called when a Log was removed
-        /// </summary>
-        /// <param name="log">The Log that was removed</param>
-        private static void OnLogRemovedEvent(Log log)
-        {
-            // If you're working in a UI environment, you might want to use Dispatcher.Invoke
-            Console.WriteLine("The log with content " + log.Content + " was removed!");
         }
 
         /// <summary>
