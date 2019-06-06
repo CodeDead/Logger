@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using CodeDead.Logger.Configuration;
@@ -24,6 +25,18 @@ namespace CodeDead.Logger.Append.File
         public JsonFileAppender()
         {
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+        }
+        
+        /// <summary>
+        /// Initialize a new JsonFileAppender
+        /// </summary>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public JsonFileAppender(Encoding encoding)
+        {
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
         }
 
@@ -35,6 +48,21 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+            Enabled = true;
+        }
+
+        /// <summary>
+        /// Initialize a new JsonFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public JsonFileAppender(string path, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = true;
         }
@@ -48,6 +76,22 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+            Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Initialize a new JsonFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public JsonFileAppender(string path, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = enabled;
         }
@@ -61,6 +105,22 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+            Enabled = true;
+        }
+
+        /// <summary>
+        /// Initialize a new JsonFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public JsonFileAppender(string path, List<LogLevel> logLevels, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            TextEncoding = encoding;
             _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = true;
         }
@@ -75,6 +135,23 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
+            Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Initialize a new JsonFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public JsonFileAppender(string path, List<LogLevel> logLevels, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            TextEncoding = encoding;
             _serializer = new JavaScriptSerializer(new SimpleTypeResolver());
             Enabled = enabled;
         }
@@ -104,7 +181,7 @@ namespace CodeDead.Logger.Append.File
                 using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Read the contents of the file
-                    using (StreamReader sr = new StreamReader(fs))
+                    using (StreamReader sr = new StreamReader(fs, TextEncoding))
                     {
                         readContents = sr.ReadToEnd();
                     }
@@ -136,7 +213,7 @@ namespace CodeDead.Logger.Append.File
                     // Convert it back into a JSON
                     string json = _serializer.Serialize(root);
 
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    using (StreamWriter sw = new StreamWriter(fs, TextEncoding))
                     {
                         sw.Write(json);
                         sw.Flush();
@@ -166,7 +243,7 @@ namespace CodeDead.Logger.Append.File
                     using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         // Read the contents of the file
-                        using (StreamReader sr = new StreamReader(fs))
+                        using (StreamReader sr = new StreamReader(fs, TextEncoding))
                         {
                             readContents = await sr.ReadToEndAsync();
                         }
@@ -198,7 +275,7 @@ namespace CodeDead.Logger.Append.File
                         // Convert it back into a JSON
                         string json = _serializer.Serialize(root);
 
-                        using (StreamWriter sw = new StreamWriter(fs))
+                        using (StreamWriter sw = new StreamWriter(fs, TextEncoding))
                         {
                             await sw.WriteAsync(json);
                             await sw.FlushAsync();

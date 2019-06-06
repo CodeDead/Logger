@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Xml.Serialization;
 using CodeDead.Logger.Append.Configuration.File;
 
@@ -9,6 +10,7 @@ namespace CodeDead.Logger.Append.File
     /// Abstract class containing the file appending logic
     /// Inherit this class to implement your own file appending logic
     /// </summary>
+    [XmlInclude(typeof(CsvFileAppender))]
     [XmlInclude(typeof(DefaultFileAppender))]
     [XmlInclude(typeof(JsonFileAppender))]
     [XmlInclude(typeof(XmlFileAppender))]
@@ -20,7 +22,13 @@ namespace CodeDead.Logger.Append.File
 
         #region Properties
         /// <summary>
-        /// Property that contains the path to which a Log object should be written
+        /// Gets or sets the encoding that should be used to write and retrieve data
+        /// </summary>
+        [XmlElement("TextEncoding")]
+        public Encoding TextEncoding { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the path to which a Log object should be written
         /// </summary>
         [XmlElement("FilePath")]
         public string FilePath

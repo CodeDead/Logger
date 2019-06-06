@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -25,6 +26,18 @@ namespace CodeDead.Logger.Append.File
         public XmlFileAppender()
         {
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new XmlSerializer(typeof(LogRoot));
+        }
+        
+        /// <summary>
+        /// Initialize a new XmlFileAppender
+        /// </summary>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public XmlFileAppender(Encoding encoding)
+        {
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new XmlSerializer(typeof(LogRoot));
         }
 
@@ -36,6 +49,21 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new XmlSerializer(typeof(LogRoot));
+            Enabled = true;
+        }
+
+        /// <summary>
+        /// Initialize a new XmlFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public XmlFileAppender(string path, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = true;
         }
@@ -49,6 +77,22 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = DefaultLogLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new XmlSerializer(typeof(LogRoot));
+            Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Initialize a new XmlFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public XmlFileAppender(string path, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            TextEncoding = encoding;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = enabled;
         }
@@ -62,6 +106,22 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new XmlSerializer(typeof(LogRoot));
+            Enabled = true;
+        }
+
+        /// <summary>
+        /// Initialize a new XmlFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public XmlFileAppender(string path, List<LogLevel> logLevels, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            TextEncoding = encoding;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = true;
         }
@@ -76,6 +136,23 @@ namespace CodeDead.Logger.Append.File
         {
             FilePath = path;
             LogLevels = logLevels;
+            TextEncoding = Encoding.Default;
+            _serializer = new XmlSerializer(typeof(LogRoot));
+            Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Initialize a new XmlFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public XmlFileAppender(string path, List<LogLevel> logLevels, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            TextEncoding = encoding;
             _serializer = new XmlSerializer(typeof(LogRoot));
             Enabled = enabled;
         }
@@ -105,7 +182,7 @@ namespace CodeDead.Logger.Append.File
                 using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     // Read the contents of the file
-                    using (StreamReader sr = new StreamReader(fs))
+                    using (StreamReader sr = new StreamReader(fs, TextEncoding))
                     {
                         readContents = sr.ReadToEnd();
                     }
@@ -145,18 +222,8 @@ namespace CodeDead.Logger.Append.File
             {
                 using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                 {
-                    string xml;
-                    using (StringWriter sww = new StringWriter())
-                    {
-                        using (XmlWriter writer = XmlWriter.Create(sww))
-                        {
-                            // Convert the object back to XML
-                            _serializer.Serialize(writer, root);
-                            xml = sww.ToString();
-                        }
-                    }
-
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    string xml = ToXml(root);
+                    using (StreamWriter sw = new StreamWriter(fs, TextEncoding))
                     {
                         sw.Write(xml);
                         sw.Flush();
@@ -186,7 +253,7 @@ namespace CodeDead.Logger.Append.File
                     using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
                         // Read the contents of the file
-                        using (StreamReader sr = new StreamReader(fs))
+                        using (StreamReader sr = new StreamReader(fs, TextEncoding))
                         {
                             readContents = await sr.ReadToEndAsync();
                         }
@@ -226,18 +293,8 @@ namespace CodeDead.Logger.Append.File
                 {
                     using (FileStream fs = System.IO.File.Open(FilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
                     {
-                        string xml;
-                        using (StringWriter sww = new StringWriter())
-                        {
-                            using (XmlWriter writer = XmlWriter.Create(sww))
-                            {
-                                // Convert the object back to XML
-                                _serializer.Serialize(writer, root);
-                                xml = sww.ToString();
-                            }
-                        }
-
-                        using (StreamWriter sw = new StreamWriter(fs))
+                        string xml = ToXml(root);
+                        using (StreamWriter sw = new StreamWriter(fs, TextEncoding))
                         {
                             await sw.WriteAsync(xml);
                             await sw.FlushAsync();
@@ -249,6 +306,26 @@ namespace CodeDead.Logger.Append.File
                     if (ThrowErrors) throw;
                 }
             });
+        }
+
+        /// <summary>
+        /// Convert a LogRoot object to an XML string
+        /// </summary>
+        /// <param name="root">The LogRoot object that should be converted into an XML string</param>
+        /// <returns>The XML string value of the serialized LogRoot object</returns>
+        private string ToXml(LogRoot root)
+        {
+            string xml;
+            using (StringWriter sww = new StringWriter())
+            {
+                using (XmlWriter writer = XmlWriter.Create(sww))
+                {
+                    // Convert the object back to XML
+                    _serializer.Serialize(writer, root);
+                    xml = sww.ToString();
+                }
+            }
+            return xml;
         }
 
         /// <inheritdoc />

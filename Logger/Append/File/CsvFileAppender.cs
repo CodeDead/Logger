@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CodeDead.Logger.Logging;
@@ -22,31 +23,31 @@ namespace CodeDead.Logger.Append.File
 
         #region Properties
         /// <summary>
-        /// Property that contains the delimiter character that can be used to split columns
+        /// Gets or sets the delimiter character that can be used to split columns
         /// </summary>
         [XmlElement("Delimiter")]
         public char Delimiter { get; set; }
 
         /// <summary>
-        /// Property that sets whether the date should be appended when exporting a Log object
+        /// Gets or sets whether the date should be appended when exporting a Log object
         /// </summary>
         [XmlElement("AppendDate")]
         public bool AppendDate { get; set; }
 
         /// <summary>
-        /// Property that sets whether the content should be appended when exporting a Log object
+        /// Gets or sets whether the content should be appended when exporting a Log object
         /// </summary>
         [XmlElement("AppendContent")]
         public bool AppendContent { get; set; }
 
         /// <summary>
-        /// Property that sets whether the context should be appended when exporting a Log object
+        /// Gets or sets whether the context should be appended when exporting a Log object
         /// </summary>
         [XmlElement("AppendContext")]
         public bool AppendContext { get; set; }
 
         /// <summary>
-        /// Property that sets whether the LogLevel should be appended when exporting a Log object
+        /// Gets or sets whether the LogLevel should be appended when exporting a Log object
         /// </summary>
         [XmlElement("AppendLogLevel")]
         public bool AppendLogLevel { get; set; }
@@ -59,6 +60,8 @@ namespace CodeDead.Logger.Append.File
         {
             LogLevels = DefaultLogLevels;
             Delimiter = DefaultDelimiter;
+            TextEncoding = Encoding.Default;
+            
             SetDefaultAppends();
         }
 
@@ -71,6 +74,24 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = DefaultLogLevels;
             Delimiter = DefaultDelimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = true;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="encoding">The encoding that should be ued to write the data</param>
+        public CsvFileAppender(string path, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            Delimiter = DefaultDelimiter;
+            TextEncoding = encoding;
             Enabled = true;
 
             SetDefaultAppends();
@@ -87,6 +108,25 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = DefaultLogLevels;
             Delimiter = DefaultDelimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = enabled;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="enabled">True if Log objects should be exported, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to write the data</param>
+        public CsvFileAppender(string path, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            Delimiter = DefaultDelimiter;
+            TextEncoding = encoding;
             Enabled = enabled;
 
             SetDefaultAppends();
@@ -103,6 +143,25 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Delimiter = DefaultDelimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = true;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="encoding">The encoding that should be used to write the data</param>
+        public CsvFileAppender(string path, List<LogLevel> logLevels, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Delimiter = DefaultDelimiter;
+            TextEncoding = encoding;
             Enabled = true;
 
             SetDefaultAppends();
@@ -120,6 +179,26 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Delimiter = delimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = true;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="delimiter">The delimiter that should be used to split the columns</param>
+        /// <param name="encoding">The encoding that should be used to write the data</param>
+        public CsvFileAppender(string path, List<LogLevel> logLevels, char delimiter, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Delimiter = delimiter;
+            TextEncoding = encoding;
             Enabled = true;
 
             SetDefaultAppends();
@@ -137,6 +216,26 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Delimiter = DefaultDelimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = enabled;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="enabled">True if Log objects should be exported, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to write the data</param>
+        public CsvFileAppender(string path, List<LogLevel> logLevels, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Delimiter = DefaultDelimiter;
+            TextEncoding = encoding;
             Enabled = enabled;
 
             SetDefaultAppends();
@@ -155,6 +254,27 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Delimiter = delimiter;
+            TextEncoding = Encoding.Default;
+            Enabled = enabled;
+
+            SetDefaultAppends();
+            LoadStream();
+        }
+
+        /// <summary>
+        /// Initialize a new CsvFileAppender
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="delimiter">The delimiter that should be used to split the columns</param>
+        /// <param name="enabled">True if Log objects should be exported, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to write the data</param>
+        public CsvFileAppender(string path, List<LogLevel> logLevels, char delimiter, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Delimiter = delimiter;
+            TextEncoding = encoding;
             Enabled = enabled;
 
             SetDefaultAppends();
@@ -180,7 +300,7 @@ namespace CodeDead.Logger.Append.File
             try
             {
                 _fs = System.IO.File.Open(FilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-                _sw = new StreamWriter(_fs);
+                _sw = new StreamWriter(_fs, TextEncoding);
             }
             catch (Exception)
             {

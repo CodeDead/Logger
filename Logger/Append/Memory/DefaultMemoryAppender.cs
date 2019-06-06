@@ -78,7 +78,7 @@ namespace CodeDead.Logger.Append.Memory
         /// <summary>
         /// Initialize a new DefaultMemoryAppender
         /// </summary>
-        /// <param name="maxInMemory"></param>
+        /// <param name="maxInMemory">The maximum amount of logs that can be stored in memory. Set to zero if there is no limit</param>
         public DefaultMemoryAppender(int maxInMemory)
         {
             MaxInMemory = maxInMemory;
@@ -91,14 +91,7 @@ namespace CodeDead.Logger.Append.Memory
         /// <param name="log">The Log object that should be stored in memory</param>
         public override void ExportLog(Log log)
         {
-            if (MaxInMemory > 0)
-            {
-                while (LogList.Count + 1 > MaxInMemory)
-                {
-                    RemoveLog(LogList[0]);
-                }
-            }
-
+            CleanLogs();
             LogList.Add(log);
         }
 
@@ -111,16 +104,21 @@ namespace CodeDead.Logger.Append.Memory
         {
             await Task.Run(() =>
             {
-                if (MaxInMemory > 0)
-                {
-                    while (LogList.Count + 1 > MaxInMemory)
-                    {
-                        RemoveLog(LogList[0]);
-                    }
-                }
-
+                CleanLogs();
                 LogList.Add(log);
             });
+        }
+
+        /// <summary>
+        /// Clean the logs if applicable
+        /// </summary>
+        private void CleanLogs()
+        {
+            if (MaxInMemory <= 0) return;
+            while (LogList.Count + 1 > MaxInMemory)
+            {
+                RemoveLog(LogList[0]);
+            }
         }
 
         /// <summary>

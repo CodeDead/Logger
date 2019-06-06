@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using CodeDead.Logger.Logging;
@@ -61,6 +62,7 @@ namespace CodeDead.Logger.Append.File
         {
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
+            TextEncoding = Encoding.Default;
             SetDefaultAppends();
         }
 
@@ -73,6 +75,25 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
+            TextEncoding = Encoding.Default;
+
+            SetDefaultAppends();
+            LoadStream();
+
+            Enabled = true;
+        }
+
+        /// <summary>
+        /// Initialize a new DefaultFileAppender object
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public DefaultFileAppender(string path, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = DefaultLogLevels;
+            Format = DefaultFormat;
+            TextEncoding = encoding;
 
             SetDefaultAppends();
             LoadStream();
@@ -90,6 +111,7 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = DefaultLogLevels;
             Format = DefaultFormat;
+            TextEncoding = Encoding.Default;
 
             SetDefaultAppends();
             LoadStream();
@@ -106,6 +128,22 @@ namespace CodeDead.Logger.Append.File
         {
             LogLevels = logLevels;
             Format = DefaultFormat;
+            TextEncoding = Encoding.Default;
+
+            SetDefaultAppends();
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initialize a new DefaultFileAppender object
+        /// </summary>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public DefaultFileAppender(List<LogLevel> logLevels, Encoding encoding)
+        {
+            LogLevels = logLevels;
+            Format = DefaultFormat;
+            TextEncoding = encoding;
 
             SetDefaultAppends();
         }
@@ -122,6 +160,28 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Format = DefaultFormat;
+            TextEncoding = Encoding.Default;
+
+            SetDefaultAppends();
+            LoadStream();
+
+            Enabled = enabled;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initialize a new DefaultFileAppender object
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public DefaultFileAppender(string path, List<LogLevel> logLevels, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Format = DefaultFormat;
+            TextEncoding = encoding;
 
             SetDefaultAppends();
             LoadStream();
@@ -141,6 +201,28 @@ namespace CodeDead.Logger.Append.File
             FilePath = path;
             LogLevels = logLevels;
             Format = format;
+            TextEncoding = Encoding.Default;
+
+            SetDefaultAppends();
+            LoadStream();
+
+            Enabled = enabled;
+        }
+
+        /// <summary>
+        /// Initialize a new DefaultFileAppender object
+        /// </summary>
+        /// <param name="path">The path of the file that should be used to write Log objects to</param>
+        /// <param name="logLevels">The List of log levels that should be exported</param>
+        /// <param name="format">The format in which the Log object should be outputted to the file</param>
+        /// <param name="enabled">True if exporting Log objects to a file should be enabled, otherwise false</param>
+        /// <param name="encoding">The encoding that should be used to read and write data</param>
+        public DefaultFileAppender(string path, List<LogLevel> logLevels, string format, bool enabled, Encoding encoding)
+        {
+            FilePath = path;
+            LogLevels = logLevels;
+            Format = format;
+            TextEncoding = encoding;
 
             SetDefaultAppends();
             LoadStream();
@@ -167,7 +249,7 @@ namespace CodeDead.Logger.Append.File
             try
             {
                 _fileStream = System.IO.File.Open(FilePath, FileMode.Append, FileAccess.Write, FileShare.Read);
-                _streamWriter = new StreamWriter(_fileStream);
+                _streamWriter = new StreamWriter(_fileStream, TextEncoding);
             }
             catch (Exception)
             {
